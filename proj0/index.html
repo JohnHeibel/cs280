@@ -465,9 +465,10 @@ document.querySelectorAll('.compare').forEach(function (block) {
         var ctx = canvas.getContext('2d');
         block.querySelector('.frame').replaceChildren(canvas);
 
-        // Frames 8-12 retrace the sweep backwards. Default playback stops at the
-        // end of the forward run; bounce mode plays the return leg too.
-        var FORWARD = 7;
+        // Frames 7-10 are the return leg. Default playback stops at the end of
+        // the forward run; bounce mode plays the return leg too.
+        var FORWARD = 6;
+        var BOUNCE_END = 10;
         var BASE_MS = 140;
 
         var controls = document.createElement('div');
@@ -491,7 +492,7 @@ document.querySelectorAll('.compare').forEach(function (block) {
         var timer = null;
 
         function span() {
-          return bounce ? total : Math.min(FORWARD, total);
+          return Math.min(bounce ? BOUNCE_END : FORWARD, total);
         }
 
         function show(n) {
