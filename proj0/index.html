@@ -218,7 +218,8 @@
   .stepper {
     display: flex;
     align-items: center;
-    gap: 18px;
+    flex-wrap: wrap;
+    gap: 12px 14px;
     font-size: 12px;
     color: #8c8c82;
   }
@@ -227,6 +228,23 @@
     text-transform: uppercase;
     font-variant-numeric: tabular-nums;
     margin-left: auto;
+  }
+  .stepper button.on {
+    color: #14140f;
+    border-bottom-color: #14140f;
+  }
+  .stepper .speed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stepper .speed input {
+    width: 74px;
+    accent-color: #14140f;
+  }
+  .stepper .rate {
+    font-variant-numeric: tabular-nums;
+    min-width: 2.8em;
   }
   footer {
     display: flex;
@@ -447,26 +465,42 @@ document.querySelectorAll('.compare').forEach(function (block) {
         var ctx = canvas.getContext('2d');
         block.querySelector('.frame').replaceChildren(canvas);
 
+        // Frames 8-12 retrace the sweep backwards. Default playback stops at the
+        // end of the forward run; bounce mode plays the return leg too.
+        var FORWARD = 7;
+        var BASE_MS = 140;
+
         var controls = document.createElement('div');
         controls.className = 'stepper';
         controls.innerHTML =
           '<button class="link" type="button" data-act="prev">Prev</button>' +
           '<button class="link" type="button" data-act="play">Play</button>' +
           '<button class="link" type="button" data-act="next">Next</button>' +
+          '<button class="link" type="button" data-act="bounce" aria-pressed="false">Bounce</button>' +
+          '<label class="speed"><input type="range" min="0.25" max="3" step="0.05" value="1" aria-label="Playback speed"><span class="rate">1&times;</span></label>' +
           '<span class="count"></span>';
         block.appendChild(controls);
 
         var count = controls.querySelector('.count');
         var playBtn = controls.querySelector('[data-act="play"]');
+        var bounceBtn = controls.querySelector('[data-act="bounce"]');
+        var speed = controls.querySelector('.speed input');
+        var rate = controls.querySelector('.rate');
+        var bounce = false;
         var i = 0;
         var timer = null;
 
+        function span() {
+          return bounce ? total : Math.min(FORWARD, total);
+        }
+
         function show(n) {
-          i = (n + total) % total;
+          var len = span();
+          i = (n + len) % len;
           decoder.decode({ frameIndex: i }).then(function (res) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
-            count.textContent = (i + 1) + ' / ' + total;
+            count.textContent = (i + 1) + ' / ' + len;
           });
         }
 
@@ -479,8 +513,13 @@ document.querySelectorAll('.compare').forEach(function (block) {
         function play() {
           if (timer) return;
           playBtn.textContent = 'Pause';
-          timer = setInterval(function () { show(i + 1); }, 140);
+          timer = setInterval(function () { show(i + 1); }, BASE_MS / parseFloat(speed.value));
         }
+
+        speed.addEventListener('input', function () {
+          rate.textContent = parseFloat(speed.value).toFixed(2).replace(/\.?0+$/, '') + '×';
+          if (timer) { stop(); play(); }
+        });
 
         controls.addEventListener('click', function (e) {
           var act = e.target.dataset.act;
@@ -490,6 +529,12 @@ document.querySelectorAll('.compare').forEach(function (block) {
           if (act === 'play') {
             if (timer) stop();
             else play();
+          }
+          if (act === 'bounce') {
+            bounce = !bounce;
+            bounceBtn.classList.toggle('on', bounce);
+            bounceBtn.setAttribute('aria-pressed', bounce ? 'true' : 'false');
+            show(i); // reclamps the index and counter into the new range
           }
         });
 
