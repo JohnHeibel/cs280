@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>John Heibel — CS 280</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    background: #fcfcfa;
+    color: #14140f;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 11vh 7vw 6vh;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    margin: 0;
+    font-family: Newsreader, Georgia, serif;
+    font-weight: 300;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+  .term {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8c8c82;
+    padding-bottom: 4px;
+  }
+  .course {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: -40px;
+  }
+  .course-code {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #14140f;
+  }
+  .course-name {
+    font-family: Newsreader, Georgia, serif;
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.35;
+    color: #57574e;
+  }
+  .projects {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #e2e2da;
+  }
+  .projects a {
+    text-decoration: none;
+    color: inherit;
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: baseline;
+    gap: 20px;
+    padding: 22px 4px 22px 0;
+    border-bottom: 1px solid #e2e2da;
+    transition: padding-left 160ms ease, background-color 160ms ease;
+  }
+  .projects a:hover {
+    background-color: #f4f4ee;
+    padding-left: 10px;
+  }
+  .projects .num {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8c8c82;
+  }
+  .projects .name {
+    font-family: Newsreader, Georgia, serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  footer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 16px;
+    font-size: 13px;
+    color: #8c8c82;
+    margin-top: auto;
+  }
+  footer a {
+    color: #8c8c82;
+    text-decoration: none;
+    border-bottom: 1px solid #dedad0;
+  }
+  footer a:hover {
+    color: #14140f;
+    border-bottom-color: #14140f;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+
+    <header>
+      <h1>John Heibel</h1>
+      <div class="term">Fall 2026</div>
+    </header>
+
+    <div class="course">
+      <span class="course-code">CS 280</span>
+      <span class="course-name">Intro to Computer Vision and Computational Photography</span>
+    </div>
+
+    <section class="projects">
+      <a href="proj0/">
+        <span class="num">00</span>
+        <span class="name">Project 0</span>
+      </a>
+    </section>
+
+    <footer>
+      <a href="https://github.com/JohnHeibel">GitHub</a>
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>
