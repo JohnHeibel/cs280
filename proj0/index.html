@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Project 0 — John Heibel</title>
+<title>Project 0 — John Heibel, CS 280</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap" rel="stylesheet">
@@ -18,47 +18,494 @@
   .page {
     min-height: 100vh;
     box-sizing: border-box;
-    padding: 11vh 7vw 6vh;
+    padding: 11vh 7vw 8vh;
   }
   .container {
-    max-width: 720px;
+    max-width: 960px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: 64px;
   }
-  .back {
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .label {
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #8c8c82;
-    text-decoration: none;
   }
-  .back:hover { color: #14140f; }
+  a.label {
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  a.label:hover {
+    color: #14140f;
+    border-bottom-color: #14140f;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 640px;
+  }
   h1 {
     margin: 0;
     font-family: Newsreader, Georgia, serif;
     font-weight: 300;
-    font-size: 44px;
-    line-height: 1;
+    font-size: 40px;
+    line-height: 1.1;
     letter-spacing: -0.015em;
   }
-  p {
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 20px;
+  }
+  .head {
+    align-items: baseline;
+    border-top: 1px solid #e2e2da;
+    padding-top: 22px;
+  }
+  h2 {
+    margin: 0;
     font-family: Newsreader, Georgia, serif;
-    font-size: 19px;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 1.2;
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  p.note {
+    margin: 0;
+    max-width: 56ch;
+    font-family: Newsreader, Georgia, serif;
+    font-size: 18px;
     font-weight: 300;
-    line-height: 1.5;
-    color: #57574e;
+    line-height: 1.6;
+    color: #3d3d36;
+    text-wrap: pretty;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #efefe8;
+  }
+  figcaption {
+    font-size: 12px;
+    color: #8c8c82;
+    letter-spacing: 0.02em;
+  }
+  .overlay {
+    display: none;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .stage {
+    position: relative;
+    height: 60vh;
+    min-height: 420px;
+    background: #f2f2ec;
+    overflow: hidden;
+    touch-action: none;
+    cursor: grab;
+  }
+  .stage img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 88%;
+    width: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px 32px;
+    font-size: 12px;
+    color: #8c8c82;
+  }
+  .controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .controls span {
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .controls input {
+    width: 100%;
+    accent-color: #14140f;
+  }
+  .hints {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    font-size: 12px;
+    color: #a8a89e;
+  }
+  button.link {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: #8c8c82;
+    cursor: pointer;
+    border-bottom: 1px solid #dedad0;
+  }
+  button.link:hover {
+    color: #14140f;
+    border-bottom-color: #14140f;
+  }
+  button.mode {
+    align-self: flex-start;
+    background: none;
+    border: 1px solid #d8d8ce;
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #14140f;
+    cursor: pointer;
+    transition: background-color 140ms ease;
+  }
+  button.mode:hover {
+    background-color: #f0f0e9;
+  }
+  .gif {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 460px;
+  }
+  .gif .frame {
+    background: #efefe8;
+  }
+  .gif img,
+  .gif canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 12px;
+    color: #8c8c82;
+  }
+  .stepper .count {
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+  footer {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #8c8c82;
+    border-top: 1px solid #e2e2da;
+    padding-top: 22px;
+  }
+  footer a {
+    color: #8c8c82;
+    text-decoration: none;
+    border-bottom: 1px solid #dedad0;
+  }
+  footer a:hover {
+    color: #14140f;
+    border-bottom-color: #14140f;
   }
 </style>
 </head>
 <body>
 <div class="page">
-  <div class="container">
-    <a class="back" href="../">← Home</a>
-    <h1>Project 0</h1>
-    <p>Coming soon.</p>
+<div class="container">
+
+  <header>
+    <a class="label" href="../">John Heibel</a>
+    <div class="label">CS 280 &middot; Fall 2026</div>
+  </header>
+
+  <div class="title">
+    <span class="label">Project 0</span>
+    <h1>Becoming Friends with Your Camera</h1>
   </div>
+
+  <section>
+    <div class="row head">
+      <span class="label">01</span>
+      <h2>Selfie: The Wrong Way vs. The Right Way</h2>
+    </div>
+
+    <div class="row">
+      <div></div>
+      <div class="body">
+        <p class="note">Placeholder. Notes on what changes between the two shots, and why the second one looks the way it does.</p>
+
+        <div class="compare" data-a="closeup.jpeg" data-b="zoomed.png" data-a-label="Close, no zoom" data-b-label="Stepped back, zoomed in">
+          <div class="pair">
+            <figure>
+              <img src="closeup.jpeg" alt="Close-up selfie taken from arm's length">
+              <figcaption>Close, no zoom</figcaption>
+            </figure>
+            <figure>
+              <img src="zoomed.png" alt="Selfie taken from several feet away, zoomed in">
+              <figcaption>Stepped back, zoomed in</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row head">
+      <span class="label">02</span>
+      <h2>Architectural Perspective Compression</h2>
+    </div>
+
+    <div class="row">
+      <div></div>
+      <div class="body">
+        <p class="note">Placeholder. Notes on how the facade reads in each shot, and why the far one looks flatter.</p>
+
+        <div class="compare" data-a="building-walked.jpeg" data-b="building-zoomed.jpeg" data-a-label="Walked up, no zoom" data-b-label="Far back, zoomed in">
+          <div class="pair">
+            <figure>
+              <img src="building-walked.jpeg" alt="Building facade photographed from close up without zoom">
+              <figcaption>Walked up, no zoom</figcaption>
+            </figure>
+            <figure>
+              <img src="building-zoomed.jpeg" alt="Building facade photographed from far away, zoomed in">
+              <figcaption>Far back, zoomed in</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row head">
+      <span class="label">03</span>
+      <h2>The Dolly Zoom</h2>
+    </div>
+
+    <div class="row">
+      <div></div>
+      <div class="body">
+        <p class="note">Placeholder. Notes on the setup, how far the camera moved, and what happens to the background across the sequence.</p>
+
+        <div class="gif" id="dolly">
+          <div class="frame">
+            <img src="dollyzoom.webp" alt="Dolly zoom sequence: a water bottle stays the same size while the background compresses">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <a href="../">Index</a>
+  </footer>
+
 </div>
+</div>
+
+<script>
+document.querySelectorAll('.compare').forEach(function (block) {
+  var defaults = { oa: 1, ob: 0.5, sa: 1, sb: 1, ax: 0, ay: 0, bx: 0, by: 0 };
+  var s = Object.assign({}, defaults);
+  var drag = null;
+
+  var pair = block.querySelector('.pair');
+  var d = block.dataset;
+
+  var overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML =
+    '<div class="stage">' +
+      '<img data-key="a" src="' + d.a + '" alt="' + d.aLabel + '" draggable="false">' +
+      '<img data-key="b" src="' + d.b + '" alt="' + d.bLabel + '" draggable="false">' +
+    '</div>' +
+    '<div class="controls">' +
+      '<label><span>' + d.aLabel + '</span><input type="range" min="0" max="1" step="0.01" value="1" data-set="oa"></label>' +
+      '<label><span>' + d.bLabel + '</span><input type="range" min="0" max="1" step="0.01" value="0.5" data-set="ob"></label>' +
+      '<label><span>Scale, first</span><input type="range" min="0.4" max="2" step="0.01" value="1" data-set="sa"></label>' +
+      '<label><span>Scale, second</span><input type="range" min="0.4" max="2" step="0.01" value="1" data-set="sb"></label>' +
+    '</div>' +
+    '<div class="hints"><span>Drag either photo to align a feature.</span><button class="link" type="button">Reset</button></div>';
+
+  var toggle = document.createElement('button');
+  toggle.className = 'mode';
+  toggle.type = 'button';
+  toggle.textContent = 'Overlay & align';
+
+  block.appendChild(overlay);
+  block.appendChild(toggle);
+
+  var stage = overlay.querySelector('.stage');
+  var imgA = overlay.querySelector('[data-key="a"]');
+  var imgB = overlay.querySelector('[data-key="b"]');
+  var inputs = overlay.querySelectorAll('.controls input');
+
+  function paint() {
+    imgA.style.opacity = s.oa;
+    imgB.style.opacity = s.ob;
+    imgA.style.transform = 'translate(calc(-50% + ' + s.ax + 'px), calc(-50% + ' + s.ay + 'px)) scale(' + s.sa + ')';
+    imgB.style.transform = 'translate(calc(-50% + ' + s.bx + 'px), calc(-50% + ' + s.by + 'px)) scale(' + s.sb + ')';
+  }
+
+  toggle.addEventListener('click', function () {
+    var on = overlay.style.display !== 'flex';
+    overlay.style.display = on ? 'flex' : 'none';
+    pair.style.display = on ? 'none' : 'grid';
+    toggle.textContent = on ? 'Side by side' : 'Overlay & align';
+    if (on) paint();
+  });
+
+  inputs.forEach(function (input) {
+    input.addEventListener('input', function () {
+      s[input.dataset.set] = parseFloat(input.value);
+      paint();
+    });
+  });
+
+  overlay.querySelector('.hints button').addEventListener('click', function () {
+    s = Object.assign({}, defaults);
+    inputs.forEach(function (input) { input.value = s[input.dataset.set]; });
+    paint();
+  });
+
+  [[imgA, 'a'], [imgB, 'b']].forEach(function (entry) {
+    entry[0].addEventListener('pointerdown', function (e) {
+      drag = { which: entry[1], px: e.clientX, py: e.clientY };
+      entry[0].setPointerCapture(e.pointerId);
+    });
+  });
+
+  stage.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    s[drag.which + 'x'] += e.clientX - drag.px;
+    s[drag.which + 'y'] += e.clientY - drag.py;
+    drag.px = e.clientX;
+    drag.py = e.clientY;
+    paint();
+  });
+
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (type) {
+    stage.addEventListener(type, function () { drag = null; });
+  });
+
+  paint();
+});
+
+(function () {
+  if (typeof ImageDecoder === 'undefined') return;
+
+  var block = document.getElementById('dolly');
+  var img = block.querySelector('img');
+  var src = img.getAttribute('src');
+
+  fetch(src).then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
+    var decoder = new ImageDecoder({ data: buf, type: 'image/webp' });
+    return decoder.tracks.ready.then(function () {
+      return decoder.completeFramesCount !== undefined ? decoder : decoder;
+    }).then(function () {
+      return decoder.decode({ frameIndex: 0 }).then(function (first) {
+        var total = decoder.tracks.selectedTrack.frameCount;
+        if (!total || total < 2) return;
+
+        var canvas = document.createElement('canvas');
+        canvas.width = first.image.displayWidth;
+        canvas.height = first.image.displayHeight;
+        var ctx = canvas.getContext('2d');
+        block.querySelector('.frame').replaceChildren(canvas);
+
+        var controls = document.createElement('div');
+        controls.className = 'stepper';
+        controls.innerHTML =
+          '<button class="link" type="button" data-act="prev">Prev</button>' +
+          '<button class="link" type="button" data-act="play">Play</button>' +
+          '<button class="link" type="button" data-act="next">Next</button>' +
+          '<span class="count"></span>';
+        block.appendChild(controls);
+
+        var count = controls.querySelector('.count');
+        var playBtn = controls.querySelector('[data-act="play"]');
+        var i = 0;
+        var timer = null;
+
+        function show(n) {
+          i = (n + total) % total;
+          decoder.decode({ frameIndex: i }).then(function (res) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
+            count.textContent = (i + 1) + ' / ' + total;
+          });
+        }
+
+        function stop() {
+          clearInterval(timer);
+          timer = null;
+          playBtn.textContent = 'Play';
+        }
+
+        function play() {
+          if (timer) return;
+          playBtn.textContent = 'Pause';
+          timer = setInterval(function () { show(i + 1); }, 140);
+        }
+
+        controls.addEventListener('click', function (e) {
+          var act = e.target.dataset.act;
+          if (!act) return;
+          if (act === 'prev') { stop(); show(i - 1); }
+          if (act === 'next') { stop(); show(i + 1); }
+          if (act === 'play') {
+            if (timer) stop();
+            else play();
+          }
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+          if (!canvas.getBoundingClientRect().height) return;
+          stop();
+          show(e.key === 'ArrowLeft' ? i - 1 : i + 1);
+        });
+
+        show(0);
+        play();
+      });
+    });
+  }).catch(function () {});
+})();
+</script>
 </body>
 </html>
