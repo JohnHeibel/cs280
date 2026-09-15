@@ -1,0 +1,2381 @@
+{
+ "tier": "llm",
+ "label": "LLM code",
+ "generated": "2026-09-15 11:17",
+ "stages": [
+  {
+   "id": "unaligned",
+   "label": "Unaligned",
+   "group": "align",
+   "before": null
+  },
+  {
+   "id": "single_l2",
+   "label": "Single-scale L2",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "single_ncc",
+   "label": "Single-scale NCC",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "pyr_l2",
+   "label": "Pyramid L2 (raw)",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "pyr_ncc",
+   "label": "Pyramid NCC (raw)",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "pyr_feat",
+   "label": "Pyramid NCC (edges)",
+   "group": "align",
+   "before": "pyr_ncc"
+  },
+  {
+   "id": "aligned_full",
+   "label": "Aligned, uncropped",
+   "group": "bw",
+   "before": null
+  },
+  {
+   "id": "crop",
+   "label": "Auto crop",
+   "group": "bw",
+   "before": "aligned_full"
+  },
+  {
+   "id": "contrast",
+   "label": "Auto contrast",
+   "group": "bw",
+   "before": "crop"
+  },
+  {
+   "id": "wb",
+   "label": "White balance",
+   "group": "bw",
+   "before": "contrast"
+  },
+  {
+   "id": "colormap",
+   "label": "Color mapping",
+   "group": "bw",
+   "before": "wb"
+  },
+  {
+   "id": "similarity",
+   "label": "Rotation + scale",
+   "group": "align",
+   "before": "pyr_feat"
+  }
+ ],
+ "images": [
+  {
+   "name": "cathedral",
+   "kind": "jpg",
+   "source": "provided",
+   "shape": [
+    341,
+    390
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/cathedral/unaligned.jpg"
+    },
+    "single_l2": {
+     "file": "img/llm/cathedral/single_l2.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.08,
+     "score": -0.0424
+    },
+    "single_ncc": {
+     "file": "img/llm/cathedral/single_ncc.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.12,
+     "score": 0.9091
+    },
+    "pyr_l2": {
+     "file": "img/llm/cathedral/pyr_l2.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      42,
+      8
+     ],
+     "seconds": 0.05,
+     "score": -0.0441,
+     "levels": 2
+    },
+    "pyr_ncc": {
+     "file": "img/llm/cathedral/pyr_ncc.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.08,
+     "score": 0.9091,
+     "levels": 2
+    },
+    "pyr_feat": {
+     "file": "img/llm/cathedral/pyr_feat.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.08,
+     "score": 0.7403,
+     "levels": 2
+    },
+    "similarity": {
+     "file": "img/llm/cathedral/similarity.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "angle_g": 0.125,
+     "scale_g": 1.005,
+     "angle_r": 0.125,
+     "scale_r": 1.0037,
+     "score": 0.7519,
+     "gain": 0.0116,
+     "accepted": true,
+     "seconds": 7.12
+    },
+    "aligned_full": {
+     "file": "img/llm/cathedral/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/cathedral/crop.jpg",
+     "box": [
+      26,
+      300,
+      7,
+      348
+     ],
+     "shape": [
+      274,
+      341
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/cathedral/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/cathedral/wb.jpg",
+     "illuminant": [
+      1.049,
+      0.9939,
+      0.9571
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/cathedral/colormap.jpg"
+    }
+   },
+   "large": "img/llm/cathedral/large.jpg",
+   "seconds": 9.8,
+   "align_seconds": 7.53
+  },
+  {
+   "name": "monastery",
+   "kind": "jpg",
+   "source": "provided",
+   "shape": [
+    341,
+    391
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/monastery/unaligned.jpg"
+    },
+    "single_l2": {
+     "file": "img/llm/monastery/single_l2.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.08,
+     "score": -0.0361
+    },
+    "single_ncc": {
+     "file": "img/llm/monastery/single_ncc.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.12,
+     "score": 0.8421
+    },
+    "pyr_l2": {
+     "file": "img/llm/monastery/pyr_l2.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.05,
+     "score": -0.0361,
+     "levels": 2
+    },
+    "pyr_ncc": {
+     "file": "img/llm/monastery/pyr_ncc.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.08,
+     "score": 0.8421,
+     "levels": 2
+    },
+    "pyr_feat": {
+     "file": "img/llm/monastery/pyr_feat.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.07,
+     "score": 0.8209,
+     "levels": 2
+    },
+    "similarity": {
+     "file": "img/llm/monastery/similarity.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "angle_g": 0.062,
+     "scale_g": 1.0,
+     "angle_r": 0.0,
+     "scale_r": 1.0,
+     "score": 0.8209,
+     "gain": 0.0,
+     "accepted": false,
+     "seconds": 7.18
+    },
+    "aligned_full": {
+     "file": "img/llm/monastery/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/monastery/crop.jpg",
+     "box": [
+      17,
+      295,
+      2,
+      353
+     ],
+     "shape": [
+      278,
+      351
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/monastery/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/monastery/wb.jpg",
+     "illuminant": [
+      0.8797,
+      0.9798,
+      1.1405
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/monastery/colormap.jpg"
+    }
+   },
+   "large": "img/llm/monastery/large.jpg",
+   "seconds": 16.2,
+   "align_seconds": 7.58
+  },
+  {
+   "name": "tobolsk",
+   "kind": "jpg",
+   "source": "provided",
+   "shape": [
+    341,
+    396
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/tobolsk/unaligned.jpg"
+    },
+    "single_l2": {
+     "file": "img/llm/tobolsk/single_l2.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      6
+     ],
+     "seconds": 0.08,
+     "score": -0.042
+    },
+    "single_ncc": {
+     "file": "img/llm/tobolsk/single_ncc.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      6
+     ],
+     "seconds": 0.12,
+     "score": 0.8514
+    },
+    "pyr_l2": {
+     "file": "img/llm/tobolsk/pyr_l2.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      6
+     ],
+     "seconds": 0.05,
+     "score": -0.042,
+     "levels": 2
+    },
+    "pyr_ncc": {
+     "file": "img/llm/tobolsk/pyr_ncc.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      6
+     ],
+     "seconds": 0.07,
+     "score": 0.8514,
+     "levels": 2
+    },
+    "pyr_feat": {
+     "file": "img/llm/tobolsk/pyr_feat.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      7
+     ],
+     "seconds": 0.07,
+     "score": 0.7986,
+     "levels": 2
+    },
+    "similarity": {
+     "file": "img/llm/tobolsk/similarity.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      7
+     ],
+     "angle_g": 0.188,
+     "scale_g": 1.0012,
+     "angle_r": 0.25,
+     "scale_r": 0.9963,
+     "score": 0.8438,
+     "gain": 0.0452,
+     "accepted": true,
+     "seconds": 6.94
+    },
+    "aligned_full": {
+     "file": "img/llm/tobolsk/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/tobolsk/crop.jpg",
+     "box": [
+      21,
+      281,
+      4,
+      354
+     ],
+     "shape": [
+      260,
+      350
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/tobolsk/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/tobolsk/wb.jpg",
+     "illuminant": [
+      0.8936,
+      1.046,
+      1.0604
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/tobolsk/colormap.jpg"
+    }
+   },
+   "large": "img/llm/tobolsk/large.jpg",
+   "seconds": 15.2,
+   "align_seconds": 7.33
+  },
+  {
+   "name": "church",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3202,
+    3634
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/church/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/church/pyr_l2.jpg",
+     "g": [
+      4,
+      25
+     ],
+     "r": [
+      350,
+      75
+     ],
+     "seconds": 0.84,
+     "score": -0.0568,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/church/pyr_ncc.jpg",
+     "g": [
+      4,
+      25
+     ],
+     "r": [
+      -4,
+      58
+     ],
+     "seconds": 1.11,
+     "score": 0.7603,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/church/pyr_feat.jpg",
+     "g": [
+      4,
+      25
+     ],
+     "r": [
+      -4,
+      58
+     ],
+     "seconds": 1.88,
+     "score": 0.6636,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/church/similarity.jpg",
+     "g": [
+      2,
+      24
+     ],
+     "r": [
+      -6,
+      57
+     ],
+     "angle_g": 0.0,
+     "scale_g": 1.0062,
+     "angle_r": 0.188,
+     "scale_r": 1.0062,
+     "score": 0.6315,
+     "gain": -0.0321,
+     "accepted": false,
+     "seconds": 13.9
+    },
+    "aligned_full": {
+     "file": "img/llm/church/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/church/crop.jpg",
+     "box": [
+      175,
+      2803,
+      4,
+      3284
+     ],
+     "shape": [
+      2628,
+      3280
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/church/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/church/wb.jpg",
+     "illuminant": [
+      0.8219,
+      0.8065,
+      1.3716
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/church/colormap.jpg"
+    }
+   },
+   "large": "img/llm/church/large.jpg",
+   "seconds": 25.8,
+   "align_seconds": 17.73
+  },
+  {
+   "name": "emir",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3209,
+    3702
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/emir/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/emir/pyr_l2.jpg",
+     "g": [
+      24,
+      49
+     ],
+     "r": [
+      44,
+      66
+     ],
+     "seconds": 0.75,
+     "score": -0.0711,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/emir/pyr_ncc.jpg",
+     "g": [
+      24,
+      49
+     ],
+     "r": [
+      43,
+      65
+     ],
+     "seconds": 0.97,
+     "score": 0.2444,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/emir/pyr_feat.jpg",
+     "g": [
+      23,
+      49
+     ],
+     "r": [
+      40,
+      107
+     ],
+     "seconds": 1.89,
+     "score": 0.5435,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/emir/similarity.jpg",
+     "g": [
+      24,
+      49
+     ],
+     "r": [
+      40,
+      106
+     ],
+     "angle_g": 0.062,
+     "scale_g": 1.0025,
+     "angle_r": 0.188,
+     "scale_r": 1.0012,
+     "score": 0.5376,
+     "gain": -0.0058,
+     "accepted": true,
+     "seconds": 13.54
+    },
+    "aligned_full": {
+     "file": "img/llm/emir/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/emir/crop.jpg",
+     "box": [
+      108,
+      2873,
+      42,
+      3283
+     ],
+     "shape": [
+      2765,
+      3241
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/emir/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/emir/wb.jpg",
+     "illuminant": [
+      1.1116,
+      0.9191,
+      0.9694
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/emir/colormap.jpg"
+    }
+   },
+   "large": "img/llm/emir/large.jpg",
+   "seconds": 21.7,
+   "align_seconds": 17.15
+  },
+  {
+   "name": "harvesters",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3218,
+    3683
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/harvesters/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/harvesters/pyr_l2.jpg",
+     "g": [
+      17,
+      59
+     ],
+     "r": [
+      13,
+      123
+     ],
+     "seconds": 0.79,
+     "score": -0.0601,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/harvesters/pyr_ncc.jpg",
+     "g": [
+      17,
+      59
+     ],
+     "r": [
+      14,
+      124
+     ],
+     "seconds": 1.03,
+     "score": 0.7814,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/harvesters/pyr_feat.jpg",
+     "g": [
+      17,
+      60
+     ],
+     "r": [
+      14,
+      123
+     ],
+     "seconds": 2.56,
+     "score": 0.3524,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/harvesters/similarity.jpg",
+     "g": [
+      17,
+      58
+     ],
+     "r": [
+      14,
+      123
+     ],
+     "angle_g": 0.188,
+     "scale_g": 1.005,
+     "angle_r": 0.312,
+     "scale_r": 1.0025,
+     "score": 0.5165,
+     "gain": 0.1641,
+     "accepted": true,
+     "seconds": 12.87
+    },
+    "aligned_full": {
+     "file": "img/llm/harvesters/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/harvesters/crop.jpg",
+     "box": [
+      234,
+      2802,
+      73,
+      3245
+     ],
+     "shape": [
+      2568,
+      3172
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/harvesters/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/harvesters/wb.jpg",
+     "illuminant": [
+      1.0704,
+      1.0151,
+      0.9144
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/harvesters/colormap.jpg"
+    }
+   },
+   "large": "img/llm/harvesters/large.jpg",
+   "seconds": 25.2,
+   "align_seconds": 17.25
+  },
+  {
+   "name": "icon",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3244,
+    3741
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/icon/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/icon/pyr_l2.jpg",
+     "g": [
+      17,
+      41
+     ],
+     "r": [
+      23,
+      90
+     ],
+     "seconds": 0.88,
+     "score": -0.0745,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/icon/pyr_ncc.jpg",
+     "g": [
+      17,
+      41
+     ],
+     "r": [
+      23,
+      89
+     ],
+     "seconds": 1.76,
+     "score": 0.6286,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/icon/pyr_feat.jpg",
+     "g": [
+      17,
+      42
+     ],
+     "r": [
+      23,
+      90
+     ],
+     "seconds": 2.03,
+     "score": 0.4021,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/icon/similarity.jpg",
+     "g": [
+      18,
+      40
+     ],
+     "r": [
+      23,
+      89
+     ],
+     "angle_g": 0.062,
+     "scale_g": 1.0025,
+     "angle_r": 0.125,
+     "scale_r": 1.0025,
+     "score": 0.5219,
+     "gain": 0.1197,
+     "accepted": true,
+     "seconds": 14.13
+    },
+    "aligned_full": {
+     "file": "img/llm/icon/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/icon/crop.jpg",
+     "box": [
+      156,
+      2866,
+      80,
+      3297
+     ],
+     "shape": [
+      2710,
+      3217
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/icon/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/icon/wb.jpg",
+     "illuminant": [
+      1.066,
+      1.0593,
+      0.8747
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/icon/colormap.jpg"
+    }
+   },
+   "large": "img/llm/icon/large.jpg",
+   "seconds": 29.6,
+   "align_seconds": 18.8
+  },
+  {
+   "name": "ilemselga",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3270,
+    3800
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/ilemselga/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/ilemselga/pyr_l2.jpg",
+     "g": [
+      7,
+      40
+     ],
+     "r": [
+      11,
+      130
+     ],
+     "seconds": 0.94,
+     "score": -0.0606,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/ilemselga/pyr_ncc.jpg",
+     "g": [
+      7,
+      40
+     ],
+     "r": [
+      11,
+      131
+     ],
+     "seconds": 1.02,
+     "score": 0.7219,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/ilemselga/pyr_feat.jpg",
+     "g": [
+      7,
+      40
+     ],
+     "r": [
+      11,
+      131
+     ],
+     "seconds": 1.9,
+     "score": 0.7122,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/ilemselga/similarity.jpg",
+     "g": [
+      7,
+      41
+     ],
+     "r": [
+      11,
+      131
+     ],
+     "angle_g": 0.062,
+     "scale_g": 0.9988,
+     "angle_r": -0.062,
+     "scale_r": 0.9988,
+     "score": 0.7023,
+     "gain": -0.0099,
+     "accepted": true,
+     "seconds": 12.7
+    },
+    "aligned_full": {
+     "file": "img/llm/ilemselga/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/ilemselga/crop.jpg",
+     "box": [
+      171,
+      2751,
+      49,
+      3295
+     ],
+     "shape": [
+      2580,
+      3246
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/ilemselga/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/ilemselga/wb.jpg",
+     "illuminant": [
+      0.7917,
+      0.8987,
+      1.3096
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/ilemselga/colormap.jpg"
+    }
+   },
+   "large": "img/llm/ilemselga/large.jpg",
+   "seconds": 24.9,
+   "align_seconds": 16.56
+  },
+  {
+   "name": "melons",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3241,
+    3770
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/melons/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/melons/pyr_l2.jpg",
+     "g": [
+      10,
+      81
+     ],
+     "r": [
+      13,
+      178
+     ],
+     "seconds": 0.83,
+     "score": -0.035,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/melons/pyr_ncc.jpg",
+     "g": [
+      10,
+      81
+     ],
+     "r": [
+      13,
+      178
+     ],
+     "seconds": 1.05,
+     "score": 0.899,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/melons/pyr_feat.jpg",
+     "g": [
+      10,
+      80
+     ],
+     "r": [
+      13,
+      177
+     ],
+     "seconds": 1.88,
+     "score": 0.4527,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/melons/similarity.jpg",
+     "g": [
+      9,
+      83
+     ],
+     "r": [
+      12,
+      180
+     ],
+     "angle_g": 0.125,
+     "scale_g": 1.0037,
+     "angle_r": 0.125,
+     "scale_r": 1.0037,
+     "score": 0.6803,
+     "gain": 0.2276,
+     "accepted": true,
+     "seconds": 12.85
+    },
+    "aligned_full": {
+     "file": "img/llm/melons/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/melons/crop.jpg",
+     "box": [
+      180,
+      2806,
+      52,
+      3285
+     ],
+     "shape": [
+      2626,
+      3233
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/melons/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/melons/wb.jpg",
+     "illuminant": [
+      1.0756,
+      0.9911,
+      0.9332
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/melons/colormap.jpg"
+    }
+   },
+   "large": "img/llm/melons/large.jpg",
+   "seconds": 22.4,
+   "align_seconds": 16.61
+  },
+  {
+   "name": "religous_painting",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3193,
+    3742
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/religous_painting/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/religous_painting/pyr_l2.jpg",
+     "g": [
+      3,
+      28
+     ],
+     "r": [
+      7,
+      68
+     ],
+     "seconds": 0.77,
+     "score": -0.0306,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/religous_painting/pyr_ncc.jpg",
+     "g": [
+      3,
+      28
+     ],
+     "r": [
+      7,
+      68
+     ],
+     "seconds": 1.26,
+     "score": 0.7589,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/religous_painting/pyr_feat.jpg",
+     "g": [
+      1,
+      30
+     ],
+     "r": [
+      6,
+      69
+     ],
+     "seconds": 2.17,
+     "score": 0.4927,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/religous_painting/similarity.jpg",
+     "g": [
+      3,
+      27
+     ],
+     "r": [
+      7,
+      68
+     ],
+     "angle_g": 0.062,
+     "scale_g": 1.0037,
+     "angle_r": 0.062,
+     "scale_r": 1.0025,
+     "score": 0.6749,
+     "gain": 0.1822,
+     "accepted": true,
+     "seconds": 14.08
+    },
+    "aligned_full": {
+     "file": "img/llm/religous_painting/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/religous_painting/crop.jpg",
+     "box": [
+      119,
+      2817,
+      113,
+      3385
+     ],
+     "shape": [
+      2698,
+      3272
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/religous_painting/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/religous_painting/wb.jpg",
+     "illuminant": [
+      1.0636,
+      1.019,
+      0.9174
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/religous_painting/colormap.jpg"
+    }
+   },
+   "large": "img/llm/religous_painting/large.jpg",
+   "seconds": 25.5,
+   "align_seconds": 18.28
+  },
+  {
+   "name": "self_portrait",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3251,
+    3810
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/self_portrait/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/self_portrait/pyr_l2.jpg",
+     "g": [
+      30,
+      79
+     ],
+     "r": [
+      37,
+      176
+     ],
+     "seconds": 0.79,
+     "score": -0.0181,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/self_portrait/pyr_ncc.jpg",
+     "g": [
+      30,
+      79
+     ],
+     "r": [
+      37,
+      176
+     ],
+     "seconds": 1.07,
+     "score": 0.7486,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/self_portrait/pyr_feat.jpg",
+     "g": [
+      30,
+      79
+     ],
+     "r": [
+      37,
+      176
+     ],
+     "seconds": 2.09,
+     "score": 0.4761,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/self_portrait/similarity.jpg",
+     "g": [
+      29,
+      78
+     ],
+     "r": [
+      36,
+      176
+     ],
+     "angle_g": 0.188,
+     "scale_g": 1.0025,
+     "angle_r": 0.25,
+     "scale_r": 1.0025,
+     "score": 0.7661,
+     "gain": 0.29,
+     "accepted": true,
+     "seconds": 12.72
+    },
+    "aligned_full": {
+     "file": "img/llm/self_portrait/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/self_portrait/crop.jpg",
+     "box": [
+      180,
+      2812,
+      50,
+      3202
+     ],
+     "shape": [
+      2632,
+      3152
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/self_portrait/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/self_portrait/wb.jpg",
+     "illuminant": [
+      1.0015,
+      1.0261,
+      0.9724
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/self_portrait/colormap.jpg"
+    }
+   },
+   "large": "img/llm/self_portrait/large.jpg",
+   "seconds": 21.4,
+   "align_seconds": 16.67
+  },
+  {
+   "name": "siren",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3250,
+    3817
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/siren/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/siren/pyr_l2.jpg",
+     "g": [
+      -5,
+      50
+     ],
+     "r": [
+      -24,
+      97
+     ],
+     "seconds": 0.91,
+     "score": -0.0519,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/siren/pyr_ncc.jpg",
+     "g": [
+      -5,
+      49
+     ],
+     "r": [
+      -24,
+      96
+     ],
+     "seconds": 0.93,
+     "score": 0.9317,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/siren/pyr_feat.jpg",
+     "g": [
+      -6,
+      49
+     ],
+     "r": [
+      -24,
+      96
+     ],
+     "seconds": 1.75,
+     "score": 0.6109,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/siren/similarity.jpg",
+     "g": [
+      -5,
+      48
+     ],
+     "r": [
+      -23,
+      97
+     ],
+     "angle_g": 0.0,
+     "scale_g": 1.0025,
+     "angle_r": 0.188,
+     "scale_r": 1.0025,
+     "score": 0.8216,
+     "gain": 0.2107,
+     "accepted": true,
+     "seconds": 11.84
+    },
+    "aligned_full": {
+     "file": "img/llm/siren/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/siren/crop.jpg",
+     "box": [
+      98,
+      2654,
+      0,
+      3129
+     ],
+     "shape": [
+      2556,
+      3129
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/siren/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/siren/wb.jpg",
+     "illuminant": [
+      0.8643,
+      0.9265,
+      1.2092
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/siren/colormap.jpg"
+    }
+   },
+   "large": "img/llm/siren/large.jpg",
+   "seconds": 21.3,
+   "align_seconds": 15.43
+  },
+  {
+   "name": "three_generations",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3209,
+    3714
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/three_generations/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/three_generations/pyr_l2.jpg",
+     "g": [
+      14,
+      53
+     ],
+     "r": [
+      11,
+      111
+     ],
+     "seconds": 0.91,
+     "score": -0.0146,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/three_generations/pyr_ncc.jpg",
+     "g": [
+      14,
+      53
+     ],
+     "r": [
+      11,
+      111
+     ],
+     "seconds": 1.18,
+     "score": 0.8904,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/three_generations/pyr_feat.jpg",
+     "g": [
+      12,
+      53
+     ],
+     "r": [
+      9,
+      111
+     ],
+     "seconds": 1.86,
+     "score": 0.5408,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/three_generations/similarity.jpg",
+     "g": [
+      15,
+      50
+     ],
+     "r": [
+      11,
+      110
+     ],
+     "angle_g": 0.188,
+     "scale_g": 1.005,
+     "angle_r": 0.188,
+     "scale_r": 1.0012,
+     "score": 0.7566,
+     "gain": 0.2158,
+     "accepted": true,
+     "seconds": 13.44
+    },
+    "aligned_full": {
+     "file": "img/llm/three_generations/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/three_generations/crop.jpg",
+     "box": [
+      112,
+      2863,
+      31,
+      3315
+     ],
+     "shape": [
+      2751,
+      3284
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/three_generations/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/three_generations/wb.jpg",
+     "illuminant": [
+      0.9787,
+      0.9415,
+      1.0797
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/three_generations/colormap.jpg"
+    }
+   },
+   "large": "img/llm/three_generations/large.jpg",
+   "seconds": 25.8,
+   "align_seconds": 17.39
+  },
+  {
+   "name": "wharf",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3244,
+    3761
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/wharf/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/wharf/pyr_l2.jpg",
+     "g": [
+      -7,
+      15
+     ],
+     "r": [
+      -16,
+      82
+     ],
+     "seconds": 1.02,
+     "score": -0.021,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/wharf/pyr_ncc.jpg",
+     "g": [
+      -7,
+      15
+     ],
+     "r": [
+      -16,
+      82
+     ],
+     "seconds": 1.08,
+     "score": 0.7654,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/wharf/pyr_feat.jpg",
+     "g": [
+      -7,
+      15
+     ],
+     "r": [
+      -16,
+      82
+     ],
+     "seconds": 1.89,
+     "score": 0.6057,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/wharf/similarity.jpg",
+     "g": [
+      -7,
+      15
+     ],
+     "r": [
+      -15,
+      81
+     ],
+     "angle_g": 0.0,
+     "scale_g": 0.9975,
+     "angle_r": 0.125,
+     "scale_r": 0.9963,
+     "score": 0.8102,
+     "gain": 0.2046,
+     "accepted": true,
+     "seconds": 14.05
+    },
+    "aligned_full": {
+     "file": "img/llm/wharf/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/wharf/crop.jpg",
+     "box": [
+      194,
+      2845,
+      0,
+      3290
+     ],
+     "shape": [
+      2651,
+      3290
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/wharf/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/wharf/wb.jpg",
+     "illuminant": [
+      0.9526,
+      0.9117,
+      1.1357
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/wharf/colormap.jpg"
+    }
+   },
+   "large": "img/llm/wharf/large.jpg",
+   "seconds": 24.9,
+   "align_seconds": 18.04
+  },
+  {
+   "name": "iset_valley",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3261,
+    3731
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/iset_valley/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/iset_valley/pyr_l2.jpg",
+     "g": [
+      25,
+      77
+     ],
+     "r": [
+      33,
+      160
+     ],
+     "seconds": 0.77,
+     "score": -0.0105,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/iset_valley/pyr_ncc.jpg",
+     "g": [
+      25,
+      77
+     ],
+     "r": [
+      33,
+      160
+     ],
+     "seconds": 1.09,
+     "score": 0.9377,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/iset_valley/pyr_feat.jpg",
+     "g": [
+      25,
+      76
+     ],
+     "r": [
+      36,
+      159
+     ],
+     "seconds": 2.05,
+     "score": 0.5732,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/iset_valley/similarity.jpg",
+     "g": [
+      26,
+      78
+     ],
+     "r": [
+      35,
+      160
+     ],
+     "angle_g": 0.125,
+     "scale_g": 0.9988,
+     "angle_r": 0.125,
+     "scale_r": 0.9925,
+     "score": 0.8183,
+     "gain": 0.2451,
+     "accepted": true,
+     "seconds": 13.95
+    },
+    "aligned_full": {
+     "file": "img/llm/iset_valley/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/iset_valley/crop.jpg",
+     "box": [
+      267,
+      2780,
+      54,
+      3318
+     ],
+     "shape": [
+      2513,
+      3264
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/iset_valley/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/iset_valley/wb.jpg",
+     "illuminant": [
+      0.959,
+      0.9877,
+      1.0533
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/iset_valley/colormap.jpg"
+    }
+   },
+   "large": "img/llm/iset_valley/large.jpg",
+   "seconds": 27.1,
+   "align_seconds": 17.86
+  },
+  {
+   "name": "kasli_workshop",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3257,
+    3751
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/kasli_workshop/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/kasli_workshop/pyr_l2.jpg",
+     "g": [
+      12,
+      54
+     ],
+     "r": [
+      10,
+      131
+     ],
+     "seconds": 0.93,
+     "score": -0.0213,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/kasli_workshop/pyr_ncc.jpg",
+     "g": [
+      12,
+      54
+     ],
+     "r": [
+      10,
+      131
+     ],
+     "seconds": 1.28,
+     "score": 0.9052,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/kasli_workshop/pyr_feat.jpg",
+     "g": [
+      12,
+      54
+     ],
+     "r": [
+      10,
+      132
+     ],
+     "seconds": 1.97,
+     "score": 0.5403,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/kasli_workshop/similarity.jpg",
+     "g": [
+      11,
+      53
+     ],
+     "r": [
+      10,
+      131
+     ],
+     "angle_g": 0.0,
+     "scale_g": 1.0037,
+     "angle_r": 0.125,
+     "scale_r": 1.0025,
+     "score": 0.7614,
+     "gain": 0.221,
+     "accepted": true,
+     "seconds": 14.97
+    },
+    "aligned_full": {
+     "file": "img/llm/kasli_workshop/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/kasli_workshop/crop.jpg",
+     "box": [
+      131,
+      2862,
+      28,
+      3397
+     ],
+     "shape": [
+      2731,
+      3369
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/kasli_workshop/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/kasli_workshop/wb.jpg",
+     "illuminant": [
+      0.9725,
+      0.9619,
+      1.0656
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/kasli_workshop/colormap.jpg"
+    }
+   },
+   "large": "img/llm/kasli_workshop/large.jpg",
+   "seconds": 22.1,
+   "align_seconds": 19.15
+  },
+  {
+   "name": "shakh_zinde",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3208,
+    3751
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/shakh_zinde/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/shakh_zinde/pyr_l2.jpg",
+     "g": [
+      9,
+      50
+     ],
+     "r": [
+      2,
+      101
+     ],
+     "seconds": 1.02,
+     "score": -0.0986,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/shakh_zinde/pyr_ncc.jpg",
+     "g": [
+      9,
+      50
+     ],
+     "r": [
+      2,
+      102
+     ],
+     "seconds": 1.43,
+     "score": 0.6785,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/shakh_zinde/pyr_feat.jpg",
+     "g": [
+      8,
+      50
+     ],
+     "r": [
+      2,
+      102
+     ],
+     "seconds": 2.41,
+     "score": 0.5695,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/shakh_zinde/similarity.jpg",
+     "g": [
+      9,
+      49
+     ],
+     "r": [
+      3,
+      99
+     ],
+     "angle_g": 0.062,
+     "scale_g": 1.0025,
+     "angle_r": 0.25,
+     "scale_r": 1.0037,
+     "score": 0.5561,
+     "gain": -0.0134,
+     "accepted": true,
+     "seconds": 14.65
+    },
+    "aligned_full": {
+     "file": "img/llm/shakh_zinde/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/shakh_zinde/crop.jpg",
+     "box": [
+      213,
+      2840,
+      19,
+      3291
+     ],
+     "shape": [
+      2627,
+      3272
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/shakh_zinde/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/shakh_zinde/wb.jpg",
+     "illuminant": [
+      1.0131,
+      1.0046,
+      0.9823
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/shakh_zinde/colormap.jpg"
+    }
+   },
+   "large": "img/llm/shakh_zinde/large.jpg",
+   "seconds": 22.5,
+   "align_seconds": 19.51
+  },
+  {
+   "name": "sugomak_lake",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3254,
+    3712
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/sugomak_lake/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/sugomak_lake/pyr_l2.jpg",
+     "g": [
+      -1,
+      34
+     ],
+     "r": [
+      -25,
+      103
+     ],
+     "seconds": 1.27,
+     "score": -0.0107,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/sugomak_lake/pyr_ncc.jpg",
+     "g": [
+      -1,
+      34
+     ],
+     "r": [
+      -24,
+      104
+     ],
+     "seconds": 1.19,
+     "score": 0.9721,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/sugomak_lake/pyr_feat.jpg",
+     "g": [
+      -1,
+      33
+     ],
+     "r": [
+      -24,
+      104
+     ],
+     "seconds": 2.49,
+     "score": 0.3569,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/sugomak_lake/similarity.jpg",
+     "g": [
+      -1,
+      33
+     ],
+     "r": [
+      -23,
+      105
+     ],
+     "angle_g": 0.062,
+     "scale_g": 1.005,
+     "angle_r": 0.312,
+     "scale_r": 1.0012,
+     "score": 0.5432,
+     "gain": 0.1864,
+     "accepted": true,
+     "seconds": 15.05
+    },
+    "aligned_full": {
+     "file": "img/llm/sugomak_lake/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/sugomak_lake/crop.jpg",
+     "box": [
+      222,
+      2845,
+      12,
+      3354
+     ],
+     "shape": [
+      2623,
+      3342
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/sugomak_lake/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/sugomak_lake/wb.jpg",
+     "illuminant": [
+      1.0224,
+      1.0002,
+      0.9773
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/sugomak_lake/colormap.jpg"
+    }
+   },
+   "large": "img/llm/sugomak_lake/large.jpg",
+   "seconds": 23.0,
+   "align_seconds": 20.0
+  },
+  {
+   "name": "sukhum_bananas",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3209,
+    3741
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/sukhum_bananas/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/sukhum_bananas/pyr_l2.jpg",
+     "g": [
+      -6,
+      55
+     ],
+     "r": [
+      -21,
+      111
+     ],
+     "seconds": 1.02,
+     "score": -0.0798,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/sukhum_bananas/pyr_ncc.jpg",
+     "g": [
+      -6,
+      55
+     ],
+     "r": [
+      -21,
+      111
+     ],
+     "seconds": 1.28,
+     "score": 0.6427,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/sukhum_bananas/pyr_feat.jpg",
+     "g": [
+      -7,
+      56
+     ],
+     "r": [
+      -21,
+      111
+     ],
+     "seconds": 2.63,
+     "score": 0.4064,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/sukhum_bananas/similarity.jpg",
+     "g": [
+      -5,
+      55
+     ],
+     "r": [
+      -20,
+      111
+     ],
+     "angle_g": 0.125,
+     "scale_g": 1.0025,
+     "angle_r": 0.188,
+     "scale_r": 1.0012,
+     "score": 0.5045,
+     "gain": 0.098,
+     "accepted": true,
+     "seconds": 13.79
+    },
+    "aligned_full": {
+     "file": "img/llm/sukhum_bananas/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/sukhum_bananas/crop.jpg",
+     "box": [
+      113,
+      2856,
+      1,
+      3292
+     ],
+     "shape": [
+      2743,
+      3291
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/sukhum_bananas/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/sukhum_bananas/wb.jpg",
+     "illuminant": [
+      0.998,
+      1.0836,
+      0.9184
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/sukhum_bananas/colormap.jpg"
+    }
+   },
+   "large": "img/llm/sukhum_bananas/large.jpg",
+   "seconds": 21.5,
+   "align_seconds": 18.72
+  },
+  {
+   "name": "suna_bridge",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3277,
+    3790
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/llm/suna_bridge/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/llm/suna_bridge/pyr_l2.jpg",
+     "g": [
+      -9,
+      48
+     ],
+     "r": [
+      -20,
+      148
+     ],
+     "seconds": 0.94,
+     "score": -0.0957,
+     "levels": 5
+    },
+    "pyr_ncc": {
+     "file": "img/llm/suna_bridge/pyr_ncc.jpg",
+     "g": [
+      -9,
+      48
+     ],
+     "r": [
+      -19,
+      147
+     ],
+     "seconds": 1.18,
+     "score": 0.7461,
+     "levels": 5
+    },
+    "pyr_feat": {
+     "file": "img/llm/suna_bridge/pyr_feat.jpg",
+     "g": [
+      -9,
+      48
+     ],
+     "r": [
+      -21,
+      148
+     ],
+     "seconds": 2.41,
+     "score": 0.6358,
+     "levels": 5
+    },
+    "similarity": {
+     "file": "img/llm/suna_bridge/similarity.jpg",
+     "g": [
+      -8,
+      49
+     ],
+     "r": [
+      -16,
+      150
+     ],
+     "angle_g": 0.062,
+     "scale_g": 0.9975,
+     "angle_r": 0.0,
+     "scale_r": 0.9925,
+     "score": 0.6721,
+     "gain": 0.0363,
+     "accepted": true,
+     "seconds": 12.91
+    },
+    "aligned_full": {
+     "file": "img/llm/suna_bridge/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/llm/suna_bridge/crop.jpg",
+     "box": [
+      255,
+      2707,
+      27,
+      3227
+     ],
+     "shape": [
+      2452,
+      3200
+     ]
+    },
+    "contrast": {
+     "file": "img/llm/suna_bridge/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/llm/suna_bridge/wb.jpg",
+     "illuminant": [
+      0.7395,
+      0.8544,
+      1.4061
+     ]
+    },
+    "colormap": {
+     "file": "img/llm/suna_bridge/colormap.jpg"
+    }
+   },
+   "large": "img/llm/suna_bridge/large.jpg",
+   "seconds": 20.1,
+   "align_seconds": 17.44
+  }
+ ],
+ "hubble": {
+  "fixed": {
+   "file": "m16_f502n.fits",
+   "scale_arcsec_px": 0.1
+  },
+  "moving": {
+   "g": {
+    "file": "m16_wfc3_f657n.fits",
+    "scale_arcsec_px": 0.0396200008690344,
+    "resample_ratio": 0.396200008690344
+   },
+   "r": {
+    "file": "m16_wfc3_f673n.fits",
+    "scale_arcsec_px": 0.0396200008690344,
+    "resample_ratio": 0.396200008690344
+   }
+  },
+  "reference": "m16_wfc3_f657n.fits (H-alpha)",
+  "offsets_dxdy_to_reference": {
+   "b": [
+    -622,
+    344
+   ],
+   "r": [
+    0,
+    0
+   ]
+  },
+  "scores": {
+   "b": 0.19337937276481199,
+   "r": 0.5674402487870619
+  },
+  "crop_box": [
+   469,
+   2150,
+   16,
+   2150
+  ],
+  "files": {
+   "unaligned": "img/llm/hubble/unaligned.jpg",
+   "aligned": "img/llm/hubble/aligned.jpg",
+   "final": "img/llm/hubble/large.jpg",
+   "zoom": "img/llm/hubble/zoom.jpg"
+  }
+ },
+ "color_matrix": [
+  [
+   1.0444841349643974,
+   -0.06870107399261902,
+   0.02421693902822157
+  ],
+  [
+   -0.07525917226343454,
+   1.161483046616635,
+   -0.08622387435320053
+  ],
+  [
+   0.025980214961119897,
+   -0.08444133953276749,
+   1.0584611245716475
+  ]
+ ]
+}

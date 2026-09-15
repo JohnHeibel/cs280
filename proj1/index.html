@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colorizing the Prokudin-Gorskii Collection — CS280A Project 1</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+<header class="site">
+  <p class="kicker">CS280A · Project 1 · Fall 2026</p>
+  <h1>Project 1: Images of the Russian Empire — Colorizing the Prokudin-Gorskii Photo Collection</h1>
+  <p class="sub">John Heibel</p>
+</header>
+<nav class="toc">
+  <a href="#lab-section">Image lab</a><a href="#single">Single-scale</a><a href="#pyramid">Pyramid</a><a href="#extra">My own plates</a><a href="#failures">Failures</a><a href="#bw">Bells &amp; whistles</a><a href="#llm">LLM comparison</a>
+</nav>
+<main>
+
+<section id="lab-section">
+  <h2><span class="num">0</span>Image lab</h2>
+  <div class="writeup">
+    <p>This is just a simple viewer of every image, along with the ability to apply each sequential alignment and bells and whistle item on to the image. This allows for some nice side by side comparisons. In the interest of not generating hundreds of images, you can only compare the before and after impacts of an image, with all previous steps already applied. There's also the option to view the versions of the image from the wholly LLM implementation by Claude Fable 5.1 tasked to implement each bells and whistles item to its furthest extent. You can simply select a given step to see the before and after for that image, along with the ability to compare the image to past and future steps.</p>
+  </div>
+  <div id="lab" class="lab"></div>
+</section>
+
+<section id="single">
+  <h2><span class="num">1</span>Single-scale alignment</h2>
+  <div class="writeup">
+    <p>This section shows the simple naive alignment search on our raw pixel values. All we do here is roll the image ±15 pixels on each axis, and score how well the channels align according to Euclidean distance or NCC. L2 is the square root of the summed squared differences between the two images, so a smaller value is a better match. NCC subtracts the mean from each image, scales each to unit length, and takes their dot product, so a larger value is a better match and overall brightness does not affect the score. To avoid scoring based off the borders, we do this alignment based off a 15% trimmed image, then apply that alignment to the full sized images. I found that this massively improved the alignment. On these three plates L2 and NCC agree almost exactly, differing by a single pixel on one channel of tobolsk. This implementation is reasonable for the small ~400 x ~400 JPEGs, but is atrociously slow on the larger ones, inspiring the need for the image pyramid implementation.</p>
+  </div>
+  <h3>Offsets on the low-resolution JPEGs</h3>
+  <div id="tbl-single"></div>
+  <h3>Results</h3>
+  <div class="gallery" id="gal-single"></div>
+  <h3>Before / after</h3>
+  <div data-compare="single_ncc" data-image="cathedral"></div>
+</section>
+
+<section id="pyramid">
+  <h2><span class="num">2</span>Multi-scale pyramid alignment</h2>
+  <div class="writeup">
+    <p>Since our full size scans are much bigger, we want a faster way of applying our alignment algorithm. To do this, we use an image pyramid, in which we form a series of smaller, downsampled images with reduced resolutions based on the source image. Each level uses a box mean from the larger image. We average a block of pixels into a single pixel. There are likely other more effective downsampling functions, but this still worked well for the uses of alignment. Then, we can start with a very small image, about 50 pixels on the short side, and we can apply our alignment algorithm over a very large search radius. At that scale the true offsets shrink to only one to three pixels, so this level only establishes the rough direction of the shift. However, we can step through the image pyramid to an image of twice the size. Since we know we didn't find any massive alignment issues, we can reduce the search space. When moving to the next finer level, I multiply the previous displacement estimate by 2 and search only a small neighborhood around that predicted displacement. At each step, we center our search space around the alignment shift from the previous step, in essence "zooming in" on our misalignment between two given color channels. This allows us to run our alignment algorithm on full size scans in a few seconds. Interestingly, I found at the smaller resolutions, simple Euclidean distance did not act identically to naive search, but NCC scoring did. NCC on raw pixels aligns every plate except Emir. L2 on raw pixels also fails on cathedral and church, which is discussed below.</p>
+  </div>
+  <h3>Offsets on all plates (raw pixels: L2, NCC; plus Sobel features)</h3>
+  <p class="hint">Highlighted cells disagree with the Sobel result by more than 3 px. * = plates I picked from the LoC collection. Times are for both channels of one configuration.</p>
+  <div id="tbl-pyramid"></div>
+  <h3>Pyramid NCC on raw pixels, all provided plates</h3>
+  <div class="gallery" id="gal-pyramid"></div>
+</section>
+
+<section id="extra">
+  <h2><span class="num">3</span>Plates I chose from the collection</h2>
+  <div class="writeup">
+    <p>I also tested this algorithm on six more plates from the Library of Congress: the mechanical workshops at Kasli, a poppy meadow at the Shah-i-Zinda in Samarkand, Lake Sugomak after sunset, banana plants and a date palm in Sukhum, the railway bridge at the mouth of the Suna river, and the Iset river valley near Kolchedan. It was simple to check, and we still see the same good results with NCC on raw pixels using the pyramid alignment implementation. Raw L2 fails on two of them, the Suna bridge and the Shah-i-Zinde meadow, while NCC aligns all six. Iset Valley was the most interesting slide I tested, as its red channel was 160 pixels off, the largest offset among the plates I chose. The Sukhum banana photo is almost entirely green. This is one of the situations in which our gray world assumption for our white balance function breaks down. This causes the image to look washed out. To fix this, we can either reduce our white balance intensity, or make different assumptions about the scene.</p>
+  </div>
+  <div class="gallery" id="gal-extra"></div>
+</section>
+
+<section id="failures">
+  <h2><span class="num">4</span>L2/NCC with raw pixel failure</h2>
+  <div class="writeup">
+    <p>Emir of Bukhara is the one plate that NCC on raw pixels cannot align. Given the raw pixel scoring metric, we can't align the red channel with the blue channel. His bright blue robe appears as almost pure white in the blue plate, and pure black in the red plate, and given its prevalence in the image, we don't have any sort of way to accurately score that with raw pixels. However, if we align based on edge features from the image gradient, we can avoid the color channel issues. When we apply the Sobel operator to calculate the horizontal and vertical edges in an image, and then score with NCC, we can see Emir is now aligned. Raw L2 also occasionally locks onto incorrect alignments, as seen for cathedral and church, because absolute intensity differences and border structure can dominate its score. NCC is substantially more robust on these plates.</p>
+  </div>
+  <div data-compare="pyr_feat" data-image="emir"></div>
+</section>
+
+<section id="bw">
+  <h2><span class="num">5</span>Bells &amp; whistles</h2>
+
+  <h3>Better features: edges</h3>
+  <div class="writeup">
+    <p>We can reuse practically all of our implementation from earlier to use edge magnitude as a feature rather than raw pixels. When we construct our image pyramid, all we have to do is apply the Sobel operator after we downsample each step. Here, I used the default 3 x 3 Sobel filter from OpenCV. This really doesn't work well below 32 pixels and we fall back to raw pixels in our image pyramid, but if there are misalignments detectable at that scale, it's likely that raw pixels will still capture that. Then, we simply run the same pyramid alignment algorithm scoring with NCC, and we see major improvements on Emir. We also see minute 1-2 pixel shifts on other images, and they possibly appear to be more accurate, but it's difficult to tell at that scale.</p>
+  </div>
+  <div data-compare="pyr_feat" data-image="emir"></div>
+
+  <h3>Automatic cropping</h3>
+  <div class="writeup">
+    <p>The first item I consider "borders" are the regions of the image that we shifted. Because np.roll puts content from the bottom of one strip at the top of the combined image, we have strange patches of the image that do not have 3 channels of color data. Because we already know how much we shifted, we can easily crop these wrapped regions out based on the offsets.</p>
+    <p>More interestingly, many of these images have notable borders, both the white outlines on the source image, and the differently colored bars seen on some images. The latter is the more notable item, and it's because not every color slide is the same, so we often do not have 3 color channels of data for those outside regions of the image. For this autocrop algorithm, I consider regions "borders" if they are in the outside 8% of the image, are the pure white borders, or do not have 3 color channels of data. To check this, I use OpenCV masks to walk inwards from each border of a given color channel to check if a given row or column has 90% of its pixels above 225 or below 30. Since we apply this to each color channel, this corresponds to really strong colors. This is calculated for each color channel, and we crop the tightest combination of these strips among all three channels to remove as much of the color bars as possible.</p>
+  </div>
+  <div data-compare="crop" data-image="emir"></div>
+
+  <h3>Automatic contrast</h3>
+  <div class="writeup">
+    <p>The first version stretched from the darkest to the brightest pixel, and it did not work. In each image, there was always at least one pure black and one pure white pixel, so it simply did nothing. The simple fix was to instead calculate the brightest and darkest values based on the 1st and 99th percentiles of the image. Then, we can clip the image based on these values, and linearly adjust all intermediate values according to our new pixel range. This works surprisingly well, and the percentiles can be adjusted to increase the effect of the contrast.</p>
+  </div>
+  <div data-compare="contrast" data-image="harvesters"></div>
+
+  <h3>Automatic white balance</h3>
+  <div class="writeup">
+    <p>The most effective implementation I had of white balance was to actually assume the image should be gray. What I do is to assume that the average of each color channel should be the same, which corresponds to gray. We can scale each color channel by the ratio of the overall mean to its own mean, which doesn't change brightness but changes the intensity of the colors. This allows whites in an image to look much more like a natural white. It has some weaknesses on plates dominated by a single color, but across all of the images it has the best general effect I found. These bells and whistles enter the range where much of it comes down to aesthetic preference.</p>
+  </div>
+  <div data-compare="wb" data-image="church"></div>
+
+  <h3>Better color mapping</h3>
+  <div class="writeup">
+    <p>Color mapping is the bells and whistle item I struggled with the most, and I never really found a magic silver bullet here. The first thing I tried was a simple warmth and tint scaling function for each pixel, applied to every image. However, I could never really find the right values. The next test I did was a simple saturation function that pushes each pixel away from grayscale luminance. This was actually my favorite, especially on greenery, but I felt that it wasn't really in the spirit of color mapping. The solution I ended on was a 3x3 mixing matrix with some fixed values. This captures the saturation changes, and also allows for more expressivity allowing for more per channel and mixed channel color changes. I did some tweaking on this, and settled on some values, but much of this is simply just aesthetic preference. In the LLM implementation, there was actually a similar approach, but instead it formed a color matrix based on averaged values from professional restorations from the Library of Congress.</p>
+  </div>
+  <div class="matrix john">C =   1.080  -0.040  -0.040        M = I + 1.3 (C - I) =   1.104  -0.052  -0.052
+     -0.030   1.060  -0.030                                -0.039   1.078  -0.039
+     -0.040  -0.040   1.080                                -0.052  -0.052   1.104</div>
+  <div data-compare="colormap" data-image="melons"></div>
+
+  <h3>All final results</h3>
+  <div class="gallery" id="gal-final"></div>
+</section>
+
+<section id="llm">
+  <h2><span class="num">6</span>LLM-Code comparison version</h2>
+  <div class="writeup">
+    <p>I implemented the Single-scale alignment, Multi-scale pyramid alignment, and the required bells and whistles for 280A by hand, but I did want to see how far I could take this assignment with unrestricted LLM usage. To do this, I tasked Claude Fable 5.1 to reimplement the bells and whistles in the most effective way, tasking it to do heavy online research to determine the best approaches. I do think that some of its implementations were definitely more effective than mine, especially around auto-cropping, and some images of white balance. However, although I like the concept of how it performed for the color map, I don't actually think the images turned out better. To some extent, that is the limit of trying to come up with general techniques across a wide range of images.</p>
+  </div>
+  <h3>Side by side: my code vs the LLM code</h3>
+  <p class="hint">Pick a plate and a step. Both images are at the same point in the pipeline, with all earlier steps applied by each version's own code, so differences accumulate as you move down the list.</p>
+  <div id="compare-lab" class="lab"></div>
+
+  <div class="llm-toggle-slot"></div>
+  <div class="llm-block">
+    <h3>Pyramid offsets, LLM code</h3>
+    <div id="tbl-pyramid-llm"></div>
+
+    <h3>Rotation + scale search</h3>
+    <div class="writeup">
+      <p>On top of the translation search, this version tries small rotations (±1.5°) and scale changes (±1 %) of the moving strip on a 700-pixel working copy, refines the winning grid cell twice, and then re-runs the translation pyramid at full resolution with the winning warp. The warp is only accepted if the gradient NCC improves by more than 0.01. It turns out the strips really are not pure translations of each other: on the melons plate a 0.4 % scale change with a 0.1° rotation lifts the gradient NCC of the green channel from 0.56 to 0.85, and the edges of the plate become noticeably sharper.</p>
+    </div>
+    <div data-compare="similarity" data-tier="llm" data-image="melons"></div>
+
+    <h3>Auto crop, LLM version</h3>
+    <div class="writeup">
+      <p>Each strip's border is detected as the run of lines connected to the edge that are saturated, very dark, or almost uniform, extended through the soft ramp where the emulsion thins out. The three boxes are then shifted by their alignment offsets and intersected, which removes the wrapped rows exactly and keeps only the region where all three channels have picture.</p>
+    </div>
+    <div data-compare="crop" data-tier="llm" data-image="emir"></div>
+
+    <h3>White balance, LLM version</h3>
+    <div class="writeup">
+      <p>The illuminant is estimated with the shades-of-gray method, a Minkowski mean with p = 6 that sits between gray-world and white-patch, computed on a blurred copy with clipped pixels excluded. The correction is the usual diagonal scaling with the gains normalized so brightness is unchanged.</p>
+    </div>
+    <div data-compare="wb" data-tier="llm" data-image="church"></div>
+
+    <h3>Learned color matrix</h3>
+    <div class="writeup">
+      <p>Nine plates for which the Library of Congress publishes a professional restoration were run through the pipeline, and a 3 × 3 matrix was fitted so that the color covariance of the output matches the restoration's. The matrices are averaged and their rows normalized to sum to one, so grays stay gray and the matrix only re-mixes hue and saturation. The result is a mild correction, mostly a small saturation boost with a slight shift of red away from blue.</p>
+    </div>
+    <div class="matrix" id="color-matrix"></div>
+    <div data-compare="colormap" data-tier="llm" data-image="emir"></div>
+
+    <h3>Hubble: Eagle Nebula pillars, 1995 and 2014 data</h3>
+    <div class="writeup">
+      <p>Three narrow-band Hubble exposures of the Eagle Nebula pillars were combined: [O III] from the 1995 WFPC2 camera as blue, and Hα and [S II] from the 2014 WFC3 camera as green and red. The two cameras have different pixel scales, which is a known instrument constant, so the WFC3 frames are resampled by that ratio; the unknown pointing difference of several hundred pixels is found by the same pyramid search on gradient features, with the mosaic footprints masked out so the search cannot lock onto their edges. The [S II] frame comes out at exactly (0, 0) relative to Hα, as it should for two exposures from the same visit.</p>
+    </div>
+    <div id="hubble"></div>
+
+    <h3>All final results, LLM code</h3>
+    <div class="gallery" id="gal-final-llm"></div>
+  </div>
+</section>
+
+</main>
+<footer>Prokudin-Gorskii plates courtesy of the Library of Congress. Hubble data from the Hubble Legacy Archive (MAST).</footer>
+<script src="captions.js?v=7"></script>
+<script src="lab.js?v=7"></script>
+</body>
+</html>

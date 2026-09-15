@@ -1,0 +1,1587 @@
+{
+ "tier": "john",
+ "label": "John's code",
+ "generated": "2026-09-15 11:15",
+ "stages": [
+  {
+   "id": "unaligned",
+   "label": "Unaligned",
+   "group": "align",
+   "before": null
+  },
+  {
+   "id": "single_l2",
+   "label": "Single-scale L2",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "single_ncc",
+   "label": "Single-scale NCC",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "pyr_l2",
+   "label": "Pyramid L2 (raw)",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "pyr_ncc",
+   "label": "Pyramid NCC (raw)",
+   "group": "align",
+   "before": "unaligned"
+  },
+  {
+   "id": "pyr_feat",
+   "label": "Pyramid NCC (edges)",
+   "group": "align",
+   "before": "pyr_ncc"
+  },
+  {
+   "id": "aligned_full",
+   "label": "Aligned, uncropped",
+   "group": "bw",
+   "before": null
+  },
+  {
+   "id": "crop",
+   "label": "Auto crop",
+   "group": "bw",
+   "before": "aligned_full"
+  },
+  {
+   "id": "contrast",
+   "label": "Auto contrast",
+   "group": "bw",
+   "before": "crop"
+  },
+  {
+   "id": "wb",
+   "label": "White balance",
+   "group": "bw",
+   "before": "contrast"
+  },
+  {
+   "id": "colormap",
+   "label": "Color mapping",
+   "group": "bw",
+   "before": "wb"
+  }
+ ],
+ "images": [
+  {
+   "name": "cathedral",
+   "kind": "jpg",
+   "source": "provided",
+   "shape": [
+    341,
+    390
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/cathedral/unaligned.jpg"
+    },
+    "single_l2": {
+     "file": "img/john/cathedral/single_l2.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.3
+    },
+    "single_ncc": {
+     "file": "img/john/cathedral/single_ncc.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.66
+    },
+    "pyr_l2": {
+     "file": "img/john/cathedral/pyr_l2.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      52,
+      9
+     ],
+     "seconds": 0.33
+    },
+    "pyr_ncc": {
+     "file": "img/john/cathedral/pyr_ncc.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.55
+    },
+    "pyr_feat": {
+     "file": "img/john/cathedral/pyr_feat.jpg",
+     "g": [
+      2,
+      5
+     ],
+     "r": [
+      3,
+      12
+     ],
+     "seconds": 0.58
+    },
+    "aligned_full": {
+     "file": "img/john/cathedral/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/cathedral/crop.jpg",
+     "shape": [
+      304,
+      364
+     ]
+    },
+    "contrast": {
+     "file": "img/john/cathedral/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/cathedral/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/cathedral/colormap.jpg"
+    }
+   },
+   "large": "img/john/cathedral/large.jpg",
+   "seconds": 2.6,
+   "align_seconds": 2.42
+  },
+  {
+   "name": "monastery",
+   "kind": "jpg",
+   "source": "provided",
+   "shape": [
+    341,
+    391
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/monastery/unaligned.jpg"
+    },
+    "single_l2": {
+     "file": "img/john/monastery/single_l2.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.3
+    },
+    "single_ncc": {
+     "file": "img/john/monastery/single_ncc.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.59
+    },
+    "pyr_l2": {
+     "file": "img/john/monastery/pyr_l2.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.33
+    },
+    "pyr_ncc": {
+     "file": "img/john/monastery/pyr_ncc.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.58
+    },
+    "pyr_feat": {
+     "file": "img/john/monastery/pyr_feat.jpg",
+     "g": [
+      2,
+      -3
+     ],
+     "r": [
+      2,
+      3
+     ],
+     "seconds": 0.6
+    },
+    "aligned_full": {
+     "file": "img/john/monastery/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/monastery/crop.jpg",
+     "shape": [
+      299,
+      366
+     ]
+    },
+    "contrast": {
+     "file": "img/john/monastery/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/monastery/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/monastery/colormap.jpg"
+    }
+   },
+   "large": "img/john/monastery/large.jpg",
+   "seconds": 2.6,
+   "align_seconds": 2.4
+  },
+  {
+   "name": "tobolsk",
+   "kind": "jpg",
+   "source": "provided",
+   "shape": [
+    341,
+    396
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/tobolsk/unaligned.jpg"
+    },
+    "single_l2": {
+     "file": "img/john/tobolsk/single_l2.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      7
+     ],
+     "seconds": 0.3
+    },
+    "single_ncc": {
+     "file": "img/john/tobolsk/single_ncc.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      6
+     ],
+     "seconds": 0.62
+    },
+    "pyr_l2": {
+     "file": "img/john/tobolsk/pyr_l2.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      7
+     ],
+     "seconds": 0.32
+    },
+    "pyr_ncc": {
+     "file": "img/john/tobolsk/pyr_ncc.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      6
+     ],
+     "seconds": 0.56
+    },
+    "pyr_feat": {
+     "file": "img/john/tobolsk/pyr_feat.jpg",
+     "g": [
+      3,
+      3
+     ],
+     "r": [
+      3,
+      7
+     ],
+     "seconds": 0.57
+    },
+    "aligned_full": {
+     "file": "img/john/tobolsk/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/tobolsk/crop.jpg",
+     "shape": [
+      291,
+      365
+     ]
+    },
+    "contrast": {
+     "file": "img/john/tobolsk/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/tobolsk/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/tobolsk/colormap.jpg"
+    }
+   },
+   "large": "img/john/tobolsk/large.jpg",
+   "seconds": 2.6,
+   "align_seconds": 2.37
+  },
+  {
+   "name": "church",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3202,
+    3634
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/church/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/church/pyr_l2.jpg",
+     "g": [
+      464,
+      49
+     ],
+     "r": [
+      453,
+      78
+     ],
+     "seconds": 1.99
+    },
+    "pyr_ncc": {
+     "file": "img/john/church/pyr_ncc.jpg",
+     "g": [
+      4,
+      25
+     ],
+     "r": [
+      -4,
+      58
+     ],
+     "seconds": 4.43
+    },
+    "pyr_feat": {
+     "file": "img/john/church/pyr_feat.jpg",
+     "g": [
+      4,
+      25
+     ],
+     "r": [
+      -4,
+      58
+     ],
+     "seconds": 4.63
+    },
+    "aligned_full": {
+     "file": "img/john/church/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/church/crop.jpg",
+     "shape": [
+      2968,
+      3394
+     ]
+    },
+    "contrast": {
+     "file": "img/john/church/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/church/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/church/colormap.jpg"
+    }
+   },
+   "large": "img/john/church/large.jpg",
+   "seconds": 12.6,
+   "align_seconds": 11.05
+  },
+  {
+   "name": "emir",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3209,
+    3702
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/emir/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/emir/pyr_l2.jpg",
+     "g": [
+      24,
+      49
+     ],
+     "r": [
+      -1513,
+      -103
+     ],
+     "seconds": 2.88
+    },
+    "pyr_ncc": {
+     "file": "img/john/emir/pyr_ncc.jpg",
+     "g": [
+      24,
+      49
+     ],
+     "r": [
+      -1122,
+      -90
+     ],
+     "seconds": 4.59
+    },
+    "pyr_feat": {
+     "file": "img/john/emir/pyr_feat.jpg",
+     "g": [
+      24,
+      49
+     ],
+     "r": [
+      40,
+      107
+     ],
+     "seconds": 4.27
+    },
+    "aligned_full": {
+     "file": "img/john/emir/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/emir/crop.jpg",
+     "shape": [
+      2868,
+      3343
+     ]
+    },
+    "contrast": {
+     "file": "img/john/emir/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/emir/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/emir/colormap.jpg"
+    }
+   },
+   "large": "img/john/emir/large.jpg",
+   "seconds": 13.8,
+   "align_seconds": 11.74
+  },
+  {
+   "name": "harvesters",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3218,
+    3683
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/harvesters/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/harvesters/pyr_l2.jpg",
+     "g": [
+      17,
+      59
+     ],
+     "r": [
+      13,
+      123
+     ],
+     "seconds": 2.6
+    },
+    "pyr_ncc": {
+     "file": "img/john/harvesters/pyr_ncc.jpg",
+     "g": [
+      17,
+      59
+     ],
+     "r": [
+      14,
+      124
+     ],
+     "seconds": 4.08
+    },
+    "pyr_feat": {
+     "file": "img/john/harvesters/pyr_feat.jpg",
+     "g": [
+      17,
+      60
+     ],
+     "r": [
+      14,
+      123
+     ],
+     "seconds": 4.05
+    },
+    "aligned_full": {
+     "file": "img/john/harvesters/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/harvesters/crop.jpg",
+     "shape": [
+      2687,
+      3372
+     ]
+    },
+    "contrast": {
+     "file": "img/john/harvesters/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/harvesters/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/harvesters/colormap.jpg"
+    }
+   },
+   "large": "img/john/harvesters/large.jpg",
+   "seconds": 12.5,
+   "align_seconds": 10.73
+  },
+  {
+   "name": "icon",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3244,
+    3741
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/icon/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/icon/pyr_l2.jpg",
+     "g": [
+      17,
+      41
+     ],
+     "r": [
+      23,
+      89
+     ],
+     "seconds": 2.82
+    },
+    "pyr_ncc": {
+     "file": "img/john/icon/pyr_ncc.jpg",
+     "g": [
+      17,
+      41
+     ],
+     "r": [
+      23,
+      89
+     ],
+     "seconds": 4.59
+    },
+    "pyr_feat": {
+     "file": "img/john/icon/pyr_feat.jpg",
+     "g": [
+      17,
+      42
+     ],
+     "r": [
+      23,
+      90
+     ],
+     "seconds": 4.25
+    },
+    "aligned_full": {
+     "file": "img/john/icon/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/icon/crop.jpg",
+     "shape": [
+      2900,
+      3411
+     ]
+    },
+    "contrast": {
+     "file": "img/john/icon/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/icon/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/icon/colormap.jpg"
+    }
+   },
+   "large": "img/john/icon/large.jpg",
+   "seconds": 13.7,
+   "align_seconds": 11.66
+  },
+  {
+   "name": "ilemselga",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3270,
+    3800
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/ilemselga/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/ilemselga/pyr_l2.jpg",
+     "g": [
+      7,
+      40
+     ],
+     "r": [
+      11,
+      131
+     ],
+     "seconds": 2.25
+    },
+    "pyr_ncc": {
+     "file": "img/john/ilemselga/pyr_ncc.jpg",
+     "g": [
+      7,
+      40
+     ],
+     "r": [
+      11,
+      131
+     ],
+     "seconds": 3.6
+    },
+    "pyr_feat": {
+     "file": "img/john/ilemselga/pyr_feat.jpg",
+     "g": [
+      7,
+      40
+     ],
+     "r": [
+      11,
+      131
+     ],
+     "seconds": 4.34
+    },
+    "aligned_full": {
+     "file": "img/john/ilemselga/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/ilemselga/crop.jpg",
+     "shape": [
+      2749,
+      3351
+     ]
+    },
+    "contrast": {
+     "file": "img/john/ilemselga/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/ilemselga/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/ilemselga/colormap.jpg"
+    }
+   },
+   "large": "img/john/ilemselga/large.jpg",
+   "seconds": 11.5,
+   "align_seconds": 10.19
+  },
+  {
+   "name": "melons",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3241,
+    3770
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/melons/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/melons/pyr_l2.jpg",
+     "g": [
+      10,
+      81
+     ],
+     "r": [
+      14,
+      178
+     ],
+     "seconds": 2.35
+    },
+    "pyr_ncc": {
+     "file": "img/john/melons/pyr_ncc.jpg",
+     "g": [
+      10,
+      81
+     ],
+     "r": [
+      14,
+      178
+     ],
+     "seconds": 4.14
+    },
+    "pyr_feat": {
+     "file": "img/john/melons/pyr_feat.jpg",
+     "g": [
+      10,
+      80
+     ],
+     "r": [
+      13,
+      177
+     ],
+     "seconds": 4.55
+    },
+    "aligned_full": {
+     "file": "img/john/melons/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/melons/crop.jpg",
+     "shape": [
+      2769,
+      3427
+     ]
+    },
+    "contrast": {
+     "file": "img/john/melons/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/melons/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/melons/colormap.jpg"
+    }
+   },
+   "large": "img/john/melons/large.jpg",
+   "seconds": 12.5,
+   "align_seconds": 11.04
+  },
+  {
+   "name": "religous_painting",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3193,
+    3742
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/religous_painting/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/religous_painting/pyr_l2.jpg",
+     "g": [
+      3,
+      28
+     ],
+     "r": [
+      7,
+      68
+     ],
+     "seconds": 2.28
+    },
+    "pyr_ncc": {
+     "file": "img/john/religous_painting/pyr_ncc.jpg",
+     "g": [
+      3,
+      28
+     ],
+     "r": [
+      7,
+      68
+     ],
+     "seconds": 4.04
+    },
+    "pyr_feat": {
+     "file": "img/john/religous_painting/pyr_feat.jpg",
+     "g": [
+      4,
+      29
+     ],
+     "r": [
+      6,
+      69
+     ],
+     "seconds": 4.27
+    },
+    "aligned_full": {
+     "file": "img/john/religous_painting/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/religous_painting/crop.jpg",
+     "shape": [
+      2774,
+      3407
+     ]
+    },
+    "contrast": {
+     "file": "img/john/religous_painting/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/religous_painting/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/religous_painting/colormap.jpg"
+    }
+   },
+   "large": "img/john/religous_painting/large.jpg",
+   "seconds": 11.9,
+   "align_seconds": 10.59
+  },
+  {
+   "name": "self_portrait",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3251,
+    3810
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/self_portrait/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/self_portrait/pyr_l2.jpg",
+     "g": [
+      30,
+      79
+     ],
+     "r": [
+      37,
+      176
+     ],
+     "seconds": 2.18
+    },
+    "pyr_ncc": {
+     "file": "img/john/self_portrait/pyr_ncc.jpg",
+     "g": [
+      30,
+      79
+     ],
+     "r": [
+      37,
+      176
+     ],
+     "seconds": 3.93
+    },
+    "pyr_feat": {
+     "file": "img/john/self_portrait/pyr_feat.jpg",
+     "g": [
+      30,
+      79
+     ],
+     "r": [
+      37,
+      176
+     ],
+     "seconds": 4.13
+    },
+    "aligned_full": {
+     "file": "img/john/self_portrait/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/self_portrait/crop.jpg",
+     "shape": [
+      2585,
+      3351
+     ]
+    },
+    "contrast": {
+     "file": "img/john/self_portrait/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/self_portrait/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/self_portrait/colormap.jpg"
+    }
+   },
+   "large": "img/john/self_portrait/large.jpg",
+   "seconds": 11.5,
+   "align_seconds": 10.24
+  },
+  {
+   "name": "siren",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3250,
+    3817
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/siren/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/siren/pyr_l2.jpg",
+     "g": [
+      -6,
+      50
+     ],
+     "r": [
+      -24,
+      97
+     ],
+     "seconds": 2.64
+    },
+    "pyr_ncc": {
+     "file": "img/john/siren/pyr_ncc.jpg",
+     "g": [
+      -6,
+      49
+     ],
+     "r": [
+      -24,
+      96
+     ],
+     "seconds": 3.97
+    },
+    "pyr_feat": {
+     "file": "img/john/siren/pyr_feat.jpg",
+     "g": [
+      -6,
+      49
+     ],
+     "r": [
+      -24,
+      96
+     ],
+     "seconds": 4.85
+    },
+    "aligned_full": {
+     "file": "img/john/siren/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/siren/crop.jpg",
+     "shape": [
+      2830,
+      3412
+     ]
+    },
+    "contrast": {
+     "file": "img/john/siren/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/siren/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/siren/colormap.jpg"
+    }
+   },
+   "large": "img/john/siren/large.jpg",
+   "seconds": 13.1,
+   "align_seconds": 11.46
+  },
+  {
+   "name": "three_generations",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3209,
+    3714
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/three_generations/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/three_generations/pyr_l2.jpg",
+     "g": [
+      14,
+      52
+     ],
+     "r": [
+      12,
+      111
+     ],
+     "seconds": 2.57
+    },
+    "pyr_ncc": {
+     "file": "img/john/three_generations/pyr_ncc.jpg",
+     "g": [
+      14,
+      52
+     ],
+     "r": [
+      11,
+      111
+     ],
+     "seconds": 4.37
+    },
+    "pyr_feat": {
+     "file": "img/john/three_generations/pyr_feat.jpg",
+     "g": [
+      12,
+      53
+     ],
+     "r": [
+      9,
+      111
+     ],
+     "seconds": 4.47
+    },
+    "aligned_full": {
+     "file": "img/john/three_generations/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/three_generations/crop.jpg",
+     "shape": [
+      2862,
+      3380
+     ]
+    },
+    "contrast": {
+     "file": "img/john/three_generations/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/three_generations/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/three_generations/colormap.jpg"
+    }
+   },
+   "large": "img/john/three_generations/large.jpg",
+   "seconds": 12.9,
+   "align_seconds": 11.41
+  },
+  {
+   "name": "wharf",
+   "kind": "tif",
+   "source": "provided",
+   "shape": [
+    3244,
+    3761
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/wharf/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/wharf/pyr_l2.jpg",
+     "g": [
+      -6,
+      15
+     ],
+     "r": [
+      -15,
+      82
+     ],
+     "seconds": 2.69
+    },
+    "pyr_ncc": {
+     "file": "img/john/wharf/pyr_ncc.jpg",
+     "g": [
+      -6,
+      15
+     ],
+     "r": [
+      -15,
+      82
+     ],
+     "seconds": 4.7
+    },
+    "pyr_feat": {
+     "file": "img/john/wharf/pyr_feat.jpg",
+     "g": [
+      -6,
+      15
+     ],
+     "r": [
+      -16,
+      82
+     ],
+     "seconds": 4.47
+    },
+    "aligned_full": {
+     "file": "img/john/wharf/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/wharf/crop.jpg",
+     "shape": [
+      2957,
+      3412
+     ]
+    },
+    "contrast": {
+     "file": "img/john/wharf/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/wharf/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/wharf/colormap.jpg"
+    }
+   },
+   "large": "img/john/wharf/large.jpg",
+   "seconds": 13.2,
+   "align_seconds": 11.86
+  },
+  {
+   "name": "iset_valley",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3261,
+    3731
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/iset_valley/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/iset_valley/pyr_l2.jpg",
+     "g": [
+      25,
+      77
+     ],
+     "r": [
+      34,
+      160
+     ],
+     "seconds": 2.53
+    },
+    "pyr_ncc": {
+     "file": "img/john/iset_valley/pyr_ncc.jpg",
+     "g": [
+      25,
+      77
+     ],
+     "r": [
+      34,
+      160
+     ],
+     "seconds": 4.4
+    },
+    "pyr_feat": {
+     "file": "img/john/iset_valley/pyr_feat.jpg",
+     "g": [
+      25,
+      76
+     ],
+     "r": [
+      36,
+      159
+     ],
+     "seconds": 4.33
+    },
+    "aligned_full": {
+     "file": "img/john/iset_valley/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/iset_valley/crop.jpg",
+     "shape": [
+      2730,
+      3362
+     ]
+    },
+    "contrast": {
+     "file": "img/john/iset_valley/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/iset_valley/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/iset_valley/colormap.jpg"
+    }
+   },
+   "large": "img/john/iset_valley/large.jpg",
+   "seconds": 12.7,
+   "align_seconds": 11.26
+  },
+  {
+   "name": "kasli_workshop",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3257,
+    3751
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/kasli_workshop/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/kasli_workshop/pyr_l2.jpg",
+     "g": [
+      12,
+      54
+     ],
+     "r": [
+      10,
+      131
+     ],
+     "seconds": 2.49
+    },
+    "pyr_ncc": {
+     "file": "img/john/kasli_workshop/pyr_ncc.jpg",
+     "g": [
+      12,
+      54
+     ],
+     "r": [
+      10,
+      131
+     ],
+     "seconds": 3.77
+    },
+    "pyr_feat": {
+     "file": "img/john/kasli_workshop/pyr_feat.jpg",
+     "g": [
+      12,
+      55
+     ],
+     "r": [
+      10,
+      132
+     ],
+     "seconds": 5.35
+    },
+    "aligned_full": {
+     "file": "img/john/kasli_workshop/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/kasli_workshop/crop.jpg",
+     "shape": [
+      2865,
+      3408
+     ]
+    },
+    "contrast": {
+     "file": "img/john/kasli_workshop/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/kasli_workshop/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/kasli_workshop/colormap.jpg"
+    }
+   },
+   "large": "img/john/kasli_workshop/large.jpg",
+   "seconds": 13.3,
+   "align_seconds": 11.61
+  },
+  {
+   "name": "shakh_zinde",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3208,
+    3751
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/shakh_zinde/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/shakh_zinde/pyr_l2.jpg",
+     "g": [
+      9,
+      50
+     ],
+     "r": [
+      1182,
+      -83
+     ],
+     "seconds": 2.32
+    },
+    "pyr_ncc": {
+     "file": "img/john/shakh_zinde/pyr_ncc.jpg",
+     "g": [
+      9,
+      50
+     ],
+     "r": [
+      2,
+      102
+     ],
+     "seconds": 4.56
+    },
+    "pyr_feat": {
+     "file": "img/john/shakh_zinde/pyr_feat.jpg",
+     "g": [
+      8,
+      50
+     ],
+     "r": [
+      2,
+      102
+     ],
+     "seconds": 5.13
+    },
+    "aligned_full": {
+     "file": "img/john/shakh_zinde/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/shakh_zinde/crop.jpg",
+     "shape": [
+      2755,
+      3417
+     ]
+    },
+    "contrast": {
+     "file": "img/john/shakh_zinde/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/shakh_zinde/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/shakh_zinde/colormap.jpg"
+    }
+   },
+   "large": "img/john/shakh_zinde/large.jpg",
+   "seconds": 13.7,
+   "align_seconds": 12.01
+  },
+  {
+   "name": "sugomak_lake",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3254,
+    3712
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/sugomak_lake/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/sugomak_lake/pyr_l2.jpg",
+     "g": [
+      -1,
+      34
+     ],
+     "r": [
+      -25,
+      103
+     ],
+     "seconds": 2.35
+    },
+    "pyr_ncc": {
+     "file": "img/john/sugomak_lake/pyr_ncc.jpg",
+     "g": [
+      -1,
+      34
+     ],
+     "r": [
+      -24,
+      104
+     ],
+     "seconds": 4.87
+    },
+    "pyr_feat": {
+     "file": "img/john/sugomak_lake/pyr_feat.jpg",
+     "g": [
+      2,
+      33
+     ],
+     "r": [
+      -24,
+      104
+     ],
+     "seconds": 5.33
+    },
+    "aligned_full": {
+     "file": "img/john/sugomak_lake/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/sugomak_lake/crop.jpg",
+     "shape": [
+      2759,
+      3498
+     ]
+    },
+    "contrast": {
+     "file": "img/john/sugomak_lake/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/sugomak_lake/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/sugomak_lake/colormap.jpg"
+    }
+   },
+   "large": "img/john/sugomak_lake/large.jpg",
+   "seconds": 14.2,
+   "align_seconds": 12.55
+  },
+  {
+   "name": "sukhum_bananas",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3209,
+    3741
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/sukhum_bananas/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/sukhum_bananas/pyr_l2.jpg",
+     "g": [
+      -6,
+      56
+     ],
+     "r": [
+      -21,
+      112
+     ],
+     "seconds": 2.33
+    },
+    "pyr_ncc": {
+     "file": "img/john/sukhum_bananas/pyr_ncc.jpg",
+     "g": [
+      -6,
+      56
+     ],
+     "r": [
+      -21,
+      112
+     ],
+     "seconds": 5.15
+    },
+    "pyr_feat": {
+     "file": "img/john/sukhum_bananas/pyr_feat.jpg",
+     "g": [
+      -7,
+      56
+     ],
+     "r": [
+      -21,
+      111
+     ],
+     "seconds": 5.23
+    },
+    "aligned_full": {
+     "file": "img/john/sukhum_bananas/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/sukhum_bananas/crop.jpg",
+     "shape": [
+      2889,
+      3374
+     ]
+    },
+    "contrast": {
+     "file": "img/john/sukhum_bananas/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/sukhum_bananas/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/sukhum_bananas/colormap.jpg"
+    }
+   },
+   "large": "img/john/sukhum_bananas/large.jpg",
+   "seconds": 14.2,
+   "align_seconds": 12.71
+  },
+  {
+   "name": "suna_bridge",
+   "kind": "tif",
+   "source": "extra",
+   "shape": [
+    3277,
+    3790
+   ],
+   "stages": {
+    "unaligned": {
+     "file": "img/john/suna_bridge/unaligned.jpg"
+    },
+    "pyr_l2": {
+     "file": "img/john/suna_bridge/pyr_l2.jpg",
+     "g": [
+      -462,
+      93
+     ],
+     "r": [
+      -448,
+      176
+     ],
+     "seconds": 2.94
+    },
+    "pyr_ncc": {
+     "file": "img/john/suna_bridge/pyr_ncc.jpg",
+     "g": [
+      -9,
+      48
+     ],
+     "r": [
+      -19,
+      147
+     ],
+     "seconds": 3.13
+    },
+    "pyr_feat": {
+     "file": "img/john/suna_bridge/pyr_feat.jpg",
+     "g": [
+      -9,
+      48
+     ],
+     "r": [
+      -18,
+      147
+     ],
+     "seconds": 2.63
+    },
+    "aligned_full": {
+     "file": "img/john/suna_bridge/aligned_full.jpg"
+    },
+    "crop": {
+     "file": "img/john/suna_bridge/crop.jpg",
+     "shape": [
+      2606,
+      3348
+     ]
+    },
+    "contrast": {
+     "file": "img/john/suna_bridge/contrast.jpg"
+    },
+    "wb": {
+     "file": "img/john/suna_bridge/wb.jpg"
+    },
+    "colormap": {
+     "file": "img/john/suna_bridge/colormap.jpg"
+    }
+   },
+   "large": "img/john/suna_bridge/large.jpg",
+   "seconds": 9.9,
+   "align_seconds": 8.7
+  }
+ ]
+}
