@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fun with Filters and Frequencies — CS280A Project 2</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+<header class="site">
+  <p class="kicker">CS280A · Project 2 · Fall 2026</p>
+  <h1>Project 2: Fun with Filters and Frequencies</h1>
+  <p class="sub">John Heibel</p>
+</header>
+<nav class="toc">
+  <a href="#lab-section">Image lab</a><a href="#conv">1.1 Convolution</a><a href="#finite">1.2 Finite difference</a><a href="#dog">1.3 DoG</a><a href="#sharpen">2.1 Sharpening</a><a href="#hybrid">2.2 Hybrid images</a><a href="#stacks">2.3 Stacks</a><a href="#blend">2.4 Blending</a><a href="#learned">What I learned</a><a href="#llm">LLM version</a>
+</nav>
+<main>
+
+<section id="lab-section">
+  <h2><span class="num">0</span>Image lab</h2>
+  <div class="writeup">
+    <p>This is a simple viewer for every image in this project, and allows you to test all functions from parts one and two. Also shows a side by side view before and after the function is applied. Since this is a static website, I only show precomputed images.</p>
+  </div>
+  <div id="lab" class="lab" data-set="blends" data-image="sam_dario"></div>
+</section>
+
+<section id="conv">
+  <h2><span class="num">1.1</span>Convolutions from scratch</h2>
+  <div class="writeup">
+    <p>4 Loop convolution targeting each individual pixel, and 2 loop convolution using numpy vector operations to perform the whole operation at one time. Both versions flip the kernel first, since it would be cross correlation otherwise.</p>
+    <p>In the four loop version, the outer two loops go through every output pixel, and the inner two go through every value of the kernel and add up pixel times weight. The two loop version gets rid of the inner loops by grabbing the whole patch of the image under the kernel and having numpy multiply and sum it</p>
+  </div>
+
+  <h3>Four loops</h3>
+<pre class="code"><code class="language-python">def convolution_4loop(image, kernel):
+    # make sure we flip so we don't do cross correlation
+    kernel = np.flip(kernel)
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = kernel.shape
+
+    # zero padding
+    pad_rows = kernel_height - 1
+    pad_cols = kernel_width - 1
+    padded = np.pad(image, ((pad_rows, pad_rows), (pad_cols, pad_cols)), mode="constant")
+    output_height = image_height + kernel_height - 1
+    output_width = image_width + kernel_width - 1
+    output = np.zeros((output_height, output_width))
+
+    for row in range(output_height):
+        for col in range(output_width):
+            total = 0
+            for kernel_row in range(kernel_height):
+                for kernel_col in range(kernel_width):
+                    pixel = padded[row + kernel_row, col + kernel_col]
+                    weight = kernel[kernel_row, kernel_col]
+                    total = total + pixel * weight
+            output[row, col] = total
+
+    return output</code></pre>
+
+  <h3>Two loops</h3>
+<pre class="code"><code class="language-python">def convolution(image, kernel):
+    #conv in 2 loops
+    kernel = np.flip(kernel)
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = kernel.shape
+
+    pad_rows = kernel_height - 1
+    pad_cols = kernel_width - 1
+    padded = np.pad(image, ((pad_rows, pad_rows), (pad_cols, pad_cols)), mode="constant")
+    output_height = image_height + kernel_height - 1
+    output_width = image_width + kernel_width - 1
+    output = np.zeros((output_height, output_width))
+
+    for row in range(output_height):
+        for col in range(output_width):
+            # Instead of going pixel by pixel and applying our kernel to each
+            # we can grab the whole patch and use numpy vectorized operations
+            window = padded[row:row + kernel_height, col:col + kernel_width]
+            output[row, col] = np.sum(window * kernel)
+
+    return output</code></pre>
+
+  <h3>Filters</h3>
+<pre class="code"><code class="language-python">def box_filter(size=9):
+    return np.ones((size, size)) / (size * size)
+
+me = load_image("mePicture.jpeg")
+
+Dx = np.array([[1.0, 0.0, -1.0]])
+Dy = np.array([[1.0], [0.0], [-1.0]])
+
+me_box = convolution(me, box_filter(9))
+me_dx = convolution(me, Dx)
+me_dy = convolution(me, Dy)</code></pre>
+
+  <h3>Comparison with scipy.signal.convolve2d</h3>
+  <div class="writeup">
+    <p>To check correctness, I ran both versions and <code>convolve2d(image, kernel, mode="full")</code> on a random 20 x 30 image with the 9 x 9 box filter. The largest difference in any pixel is around 1e-16 for both of mine, which is just floating point rounding (the test image is random, so the exact number changes a little each run). For runtime, I timed all three on the 300 x 300 Taj Mahal image with the same box filter:</p>
+  </div>
+  <table class="offsets narrow">
+    <thead><tr><th>version</th><th>time</th></tr></thead>
+    <tbody>
+      <tr><td>four loops</td><td>1.78 s</td></tr>
+      <tr><td>two loops</td><td>0.16 s</td></tr>
+      <tr><td>scipy</td><td>0.007 s</td></tr>
+    </tbody>
+  </table>
+  <div class="writeup">
+    <p>While the same operations are performed for four loops versus two loops in the two convolutions, the two loop convolution is almost 10 times as fast, as we perform a substantial portion of the operations in numpy. Scipy is much faster than both implementations, likely due to it being implemented in C and heavily optimized.</p>
+    <p>Since we were instructed to use zero padding for this part, that means that when we slide the convolution through our image, any part of the kernel that lands outside of the source image uses zero values for those pixels. This creates an artificial dark border with our box filter. Since the box filter returns the average of pixels within its kernel, on the edges, a substantial number of those values would be 0, which correspond to black. Thus the pixels on the edges will artificially become black due to this padding. This matches scipy's <code>convolve2d</code> with <code>mode="full"</code>, which also pads with zeros by default; for the rest of the project I switch to <code>boundary="symm"</code>, which mirrors the image instead.</p>
+  </div>
+
+  <h3>Results on a picture of me</h3>
+  <div class="gallery four">
+    <figure><img src="images/me.jpg" alt="Grayscale photo of me"><figcaption>original (grayscale)</figcaption></figure>
+    <figure><img src="images/me_box.jpg" alt="Box filtered"><figcaption>9 x 9 box filter</figcaption></figure>
+    <figure><img src="images/me_dx.jpg" alt="Dx"><figcaption>Dx</figcaption></figure>
+    <figure><img src="images/me_dy.jpg" alt="Dy"><figcaption>Dy</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>The box filter blurs the image. Dx responds to vertical edges like the railing posts and the sides of my body, and Dy responds to horizontal edges like the horizon and the rails. Gray means no change, and light or dark means a change in one direction or the other.</p>
+  </div>
+</section>
+
+<section id="finite">
+  <h2><span class="num">1.2</span>Finite difference operator</h2>
+  <div class="writeup">
+    <p>Convolving the cameraman with <code>Dx = [1, 0, -1]</code> and its transpose Dy gives the partial derivatives in x and y, and combining them as <code>sqrt(dx^2 + dy^2)</code> gives the gradient magnitude. Then we can just set a threshold for magnitudes to capture edges</p>
+  </div>
+  <div class="gallery five">
+    <figure><img src="images/cameraman.jpg" alt="Cameraman"><figcaption>original</figcaption></figure>
+    <figure><img src="images/cam_dx.jpg" alt="Partial derivative in x"><figcaption>partial derivative in x</figcaption></figure>
+    <figure><img src="images/cam_dy.jpg" alt="Partial derivative in y"><figcaption>partial derivative in y</figcaption></figure>
+    <figure><img src="images/cam_magnitude.jpg" alt="Gradient magnitude"><figcaption>gradient magnitude</figcaption></figure>
+    <figure><img src="images/cam_edges.jpg" alt="Edges"><figcaption>edges, threshold 0.34</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>For the cameraman image, I used a threshold of 0.34, which captures the edges of the figure without capturing most of the noise from the grass. This does lose a few edges within the figure. The threshold was also applied to a few of the images in the image lab, showing that this singular value does not generalize very well. Luckily, theres something we can do to improve it.</p>
+  </div>
+  <div data-compare="fd_edges" data-image="cameraman"></div>
+</section>
+
+<section id="dog">
+  <h2><span class="num">1.3</span>Derivative of Gaussian (DoG) filter</h2>
+  <div class="writeup">
+    <p>To deal with the noise, I first blur the image with a Gaussian. I build the Gaussian with <code>cv2.getGaussianKernel</code>, which gives a 1D kernel, and then take an outer product with its transpose to get the 2D kernel.</p>
+  </div>
+<pre class="code"><code class="language-python">def gaussian_1d(strength):
+    # allow us to set the strngth and size of the gaussian
+    # makes our life much easier when we use this later in part 2
+    size = int(6 * strength + 1)
+    if size % 2 == 0:
+        size = size + 1
+    return cv2.getGaussianKernel(size, strength)
+
+def gaussian_2(strength):
+    kernel_1d = gaussian_1d(strength)
+    return kernel_1d @ kernel_1d.T</code></pre>
+
+  <h3>Blur first, then take the derivative</h3>
+  <div class="gallery five">
+    <figure><img src="images/cam_blurred.jpg" alt="Blurred"><figcaption>blurred, sigma 1</figcaption></figure>
+    <figure><img src="images/cam_blur_dx.jpg" alt="Dx"><figcaption>partial derivative in x</figcaption></figure>
+    <figure><img src="images/cam_blur_dy.jpg" alt="Dy"><figcaption>partial derivative in y</figcaption></figure>
+    <figure><img src="images/cam_blur_magnitude.jpg" alt="Magnitude"><figcaption>gradient magnitude</figcaption></figure>
+    <figure><img src="images/cam_blur_edges.jpg" alt="Edges"><figcaption>edges, threshold 0.2</figcaption></figure>
+  </div>
+  <div class="gallery two">
+    <figure><img src="images/cam_edges.jpg" alt="Finite difference edges"><figcaption>finite difference only, threshold 0.34</figcaption></figure>
+    <figure><img src="images/cam_blur_edges.jpg" alt="Blurred edges"><figcaption>Gaussian blur first, threshold 0.2</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>The blur removes the fine grass texture before the derivative ever sees it, so the gradient magnitude image is much cleaner. Because the noise is gone, I could drop the threshold from 0.34 to 0.2 without the grass coming back, which recovers edges that were lost before. The threshold also has to come down, because the blur spreads each real edge over more pixels, so its gradient is weaker and 0.34 would throw away real edges.</p>
+  </div>
+
+  <h3>DoG filters</h3>
+  <div class="writeup">
+    <p>Convolution is associative, so instead of blurring the image and then taking the derivative, I can convolve the Gaussian with Dx and Dy once and use those derivative of Gaussian filters on the image with a single convolution.</p>
+  </div>
+  <div class="gallery three small">
+    <figure><img class="pixel" src="images/gaussian_filter.png" alt="Gaussian"><figcaption>Gaussian, sigma 1</figcaption></figure>
+    <figure><img class="pixel" src="images/dog_x_filter.png" alt="DoG x"><figcaption>DoG filter in x</figcaption></figure>
+    <figure><img class="pixel" src="images/dog_y_filter.png" alt="DoG y"><figcaption>DoG filter in y</figcaption></figure>
+  </div>
+  <div class="gallery four">
+    <figure><img src="images/cam_dog_dx.jpg" alt="DoG x result"><figcaption>DoG x</figcaption></figure>
+    <figure><img src="images/cam_dog_dy.jpg" alt="DoG y result"><figcaption>DoG y</figcaption></figure>
+    <figure><img src="images/cam_dog_magnitude.jpg" alt="DoG magnitude"><figcaption>DoG gradient magnitude</figcaption></figure>
+    <figure><img src="images/cam_dog_edges.jpg" alt="DoG edges"><figcaption>DoG edges, threshold 0.2</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>Both ways give the same result: the largest difference in any pixel is about 7e-16, and the two edge images are identical.</p>
+  </div>
+  <div data-compare="dog_edges" data-image="cameraman"></div>
+
+  <h3>Bells &amp; whistles: gradient orientation</h3>
+  <div class="writeup">
+    <p>The orientation at each pixel is the angle of the vector (dx, dy), using the DoG gradients. I use <code>np.arctan2(dy, dx)</code> to get the angle, which I then map to a color.</p>
+  </div>
+<pre class="code"><code class="language-python">def orientation_image(angle, brightness):
+    hsv = np.zeros((angle.shape[0], angle.shape[1], 3))
+    hsv[:, :, 0] = (angle + math.pi) / (2 * math.pi)
+    hsv[:, :, 1] = np.ones(angle.shape)
+    hsv[:, :, 2] = brightness
+    return matplotlib.colors.hsv_to_rgb(hsv)
+
+angle = np.arctan2(dog_gradient_y, dog_gradient_x)
+
+orientation = orientation_image(angle, np.clip(dog_magnitude / 0.3, 0, 1))
+
+orientation_full = orientation_image(angle, np.ones(angle.shape))</code></pre>
+  <div class="gallery three">
+    <figure><img src="images/cameraman.jpg" alt="Cameraman"><figcaption>original</figcaption></figure>
+    <figure><img src="images/orientation_full.jpg" alt="Orientation, hue only"><figcaption>hue = orientation, full brightness</figcaption></figure>
+    <figure><img src="images/orientation.jpg" alt="Orientation with magnitude"><figcaption>hue = orientation, brightness = gradient magnitude</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>This angle goes from -pi to pi, so I rescale it to 0 to 1 and use it as the hue in HSV. Hue is a circle, which matches the fact that angles wrap around, so an angle just below pi and one just above -pi get almost the same color. With full brightness everywhere, the sky and the grass turn into colored noise, because a pixel with a tiny gradient still has an angle. So in the final version the brightness is the gradient magnitude (divided by 0.3 and clipped), which makes flat areas go dark and leaves only the real edges colored. Edges facing the same way have the same color, and the two sides of each tripod leg are opposite colors because the brightness changes in opposite directions across them.</p>
+  </div>
+  <div data-compare="orientation" data-image="cameraman"></div>
+</section>
+
+<section id="sharpen">
+  <h2><span class="num">2.1</span>Image "sharpening"</h2>
+  <div class="writeup">
+    <p>A Gaussian blur is a low pass filter, so it keeps only the low frequencies of an image. Subtracting the blurred image from the original leaves what the blur took away, which is the high frequencies. Our image looks sharper when those are stronger, so the unsharp mask adds them back on top of the original:</p>
+  </div>
+  <div class="formula">sharpened = image + amount * (image - blurred)</div>
+  <div class="writeup">
+    <p>We can make this into one filter. If <code>e</code> is the unit impulse (a 1 in the center and zeros everywhere else) and <code>g</code> is the Gaussian, the sharpened image is just the original convolved with <code>(1 + amount) e - amount g</code>. We are essentialy just boosting all frequencies while lowering low frequencies, resulting in our high "sharp" frequencies being boosted.</p>
+  </div>
+<pre class="code"><code class="language-python">def unsharp_mask_filter(strength, amount):
+    # subtract blurred version of our image from our image to get high frequencies
+    kernel = -amount * gaussian_2(strength)
+    center = kernel.shape[0] // 2
+    kernel[center, center] += 1 + amount
+    return kernel
+
+def sharpen(image, strength, amount):
+    kernel = unsharp_mask_filter(strength, amount)
+    return np.clip(convolve_color(image, kernel), 0, 1)</code></pre>
+
+  <h3>Taj Mahal</h3>
+  <p class="hint">Gaussian sigma 2, amount 1.5. The high frequency image has 0.5 added so that zero shows up as gray.</p>
+  <div class="gallery four">
+    <figure><img src="images/taj.jpg" alt="Taj"><figcaption>original</figcaption></figure>
+    <figure><img src="images/taj_blurred.jpg" alt="Blurred"><figcaption>blurred</figcaption></figure>
+    <figure><img src="images/taj_high.jpg" alt="High frequencies"><figcaption>high frequencies</figcaption></figure>
+    <figure><img src="images/taj_sharpened.jpg" alt="Sharpened"><figcaption>sharpened</figcaption></figure>
+  </div>
+
+  <h3>My cat</h3>
+  <p class="hint">Same settings. The fur and whiskers are where most of the high frequencies are.</p>
+  <div class="gallery four">
+    <figure><img src="images/cat.jpg" alt="Cat"><figcaption>original</figcaption></figure>
+    <figure><img src="images/cat_blurred.jpg" alt="Blurred"><figcaption>blurred</figcaption></figure>
+    <figure><img src="images/cat_high.jpg" alt="High frequencies"><figcaption>high frequencies</figcaption></figure>
+    <figure><img src="images/cat_sharpened.jpg" alt="Sharpened"><figcaption>sharpened</figcaption></figure>
+  </div>
+
+  <h3>Changing the amount</h3>
+  <div class="gallery five">
+    <figure><img src="images/taj_amount_0.jpg" alt="amount 0"><figcaption>amount 0 (original)</figcaption></figure>
+    <figure><img src="images/taj_amount_1.jpg" alt="amount 1"><figcaption>amount 1</figcaption></figure>
+    <figure><img src="images/taj_amount_2.jpg" alt="amount 2"><figcaption>amount 2</figcaption></figure>
+    <figure><img src="images/taj_amount_4.jpg" alt="amount 4"><figcaption>amount 4</figcaption></figure>
+    <figure><img src="images/taj_amount_8.jpg" alt="amount 8"><figcaption>amount 8</figcaption></figure>
+  </div>
+  <div data-compare="sharpen_4" data-image="my_cat"></div>
+
+  <h3>Blurring a sharp image and sharpening it again</h3>
+  <div class="gallery three">
+    <figure><img src="images/resharpen_original.jpg" alt="Original"><figcaption>original</figcaption></figure>
+    <figure><img src="images/resharpen_blurred.jpg" alt="Blurred"><figcaption>blurred, sigma 2</figcaption></figure>
+    <figure><img src="images/resharpen_restored.jpg" alt="Sharpened"><figcaption>blurred, then sharpened (sigma 2, amount 2)</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>I blurred the cameraman with sigma 2 and then sharpened the blurred image with sigma 2 and amount 2. The sharpened image looks a lot better than the blurred one, and the big edges like the coat, the tripod and the horizon have strong contrast again. But it does not get back to the original. The fine detail in the grass, the face and the camera is still missing. Sharpening can only boost the frequencies that are still in the image, and the blur already removed the highest ones, so there is nothing left there to boost. Sharpening makes an image look sharper, but it does not undo a blur.</p>
+  </div>
+</section>
+
+<section id="hybrid">
+  <h2><span class="num">2.2</span>Hybrid images</h2>
+  <div class="writeup">
+    <p>Our hybrid images adds the low frequencies of one image to the high frequencies of another. Up close the high frequencies win, and from far away, or small on the screen, only the low frequencies are visible. The low pass filter is a Gaussian blur, and the high pass filter is the image minus its Gaussian blur.</p>
+  </div>
+  <div id="hybrid-viewer" class="lab" data-image="derek_nutmeg"></div>
+
+  <h3>Derek and Nutmeg</h3>
+  <div class="writeup">
+    <p>To have a good looking hybrid image, you need to make sure the images align. I picked the two eyes in each photo and rotated, scaled and shifted Nutmeg so that the points from the cats eyes land on Derek's.</p>
+  </div>
+  <div class="gallery three">
+    <figure><img src="images/derek.jpg" alt="Derek"><figcaption>Derek</figcaption></figure>
+    <figure><img src="images/nutmeg.jpg" alt="Nutmeg"><figcaption>Nutmeg</figcaption></figure>
+    <figure><img src="images/nutmeg_aligned.jpg" alt="Nutmeg aligned"><figcaption>Nutmeg aligned to Derek</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>Then I low pass Derek, high pass Nutmeg, and add them.</p>
+  </div>
+  <div class="gallery three">
+    <figure><img src="images/derek_low.jpg" alt="Derek low"><figcaption>Derek, low pass (sigma 8)</figcaption></figure>
+    <figure><img src="images/nutmeg_high.jpg" alt="Nutmeg high"><figcaption>Nutmeg, high pass (sigma 4)</figcaption></figure>
+    <figure><img src="images/derek_nutmeg.jpg" alt="Hybrid"><figcaption>hybrid</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>Cutoff frequencies were chosen pretty arbitrarily, and it was mostly just guess and check, then choose what aestheticly looked the best. Derek uses sigma 8, which is enough blur that his eyes and mouth stop competing with the cat up close, while the shape of his head and hair still reads from far away. Nutmeg uses sigma 4, which keeps the whiskers and fur but removes the large light and dark areas of the cat that would otherwise still be visible from a distance.</p>
+    <p>Finally, the frequency analysis. These are the log magnitudes of the Fourier transform of each image. The center of each plot is the lowest frequency. After the low pass, Derek only has energy near the center. After the high pass, Nutmeg has a dark spot in the center and keeps everything further out. The hybrid has both: Derek's bright center with Nutmeg's pattern around it.</p>
+  </div>
+  <div class="gallery five">
+    <figure><img src="images/fft_derek.jpg" alt="FFT Derek"><figcaption>Derek</figcaption></figure>
+    <figure><img src="images/fft_nutmeg.jpg" alt="FFT Nutmeg"><figcaption>Nutmeg (aligned)</figcaption></figure>
+    <figure><img src="images/fft_derek_low.jpg" alt="FFT Derek low"><figcaption>Derek, low pass</figcaption></figure>
+    <figure><img src="images/fft_nutmeg_high.jpg" alt="FFT Nutmeg high"><figcaption>Nutmeg, high pass</figcaption></figure>
+    <figure><img src="images/fft_hybrid.jpg" alt="FFT hybrid"><figcaption>hybrid</figcaption></figure>
+  </div>
+
+  <h3>Sam and Dario</h3>
+  <div class="writeup">
+    <p>For faces I aligned on three points, both eyes and the mouth, instead of two. Sam is the low frequency image (sigma 10) and Dario is the high frequency image (sigma 6). I also tried it the other way around, with Dario low and Sam high. I like the first one better. Sam is recognizable from just the overall shape of his face and hair, so he works as the low frequency image. Dario is harder to recognize without details like his glasses and curls, which are high frequency features, so in the reversed version those get blurred away.</p>
+  </div>
+  <div class="gallery four">
+    <figure><img src="images/sam.jpg" alt="Sam"><figcaption>Sam</figcaption></figure>
+    <figure><img src="images/dario.jpg" alt="Dario"><figcaption>Dario</figcaption></figure>
+    <figure><img src="images/sam_dario_hybrid.jpg" alt="Sam low, Dario high"><figcaption>hybrid: Sam low, Dario high</figcaption></figure>
+    <figure><img src="images/dario_sam_hybrid.jpg" alt="Dario low, Sam high"><figcaption>reversed: Dario low, Sam high</figcaption></figure>
+  </div>
+
+  <h3>My cat and Oski</h3>
+  <div class="writeup">
+    <p>Oski is the low frequency image (sigma 8) and my cat is the high frequency image (sigma 4), aligned on the eyes and cropped to the head and chest.</p>
+  </div>
+  <div class="gallery three">
+    <figure><img src="images/oski.jpg" alt="Oski"><figcaption>Oski</figcaption></figure>
+    <figure><img src="images/my_cat.jpg" alt="My cat"><figcaption>my cat</figcaption></figure>
+    <figure><img src="images/oski_cat_hybrid.jpg" alt="Hybrid"><figcaption>hybrid</figcaption></figure>
+  </div>
+
+  <h3>Bells &amp; whistles: color</h3>
+  <div class="gallery four">
+    <figure><img src="images/color_both_gray.jpg" alt="Both gray"><figcaption>both gray</figcaption></figure>
+    <figure><img src="images/color_low_only.jpg" alt="Color low only"><figcaption>color in low frequencies only</figcaption></figure>
+    <figure><img src="images/color_high_only.jpg" alt="Color high only"><figcaption>color in high frequencies only</figcaption></figure>
+    <figure><img src="images/color_both.jpg" alt="Both color"><figcaption>both color</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>Color matters much more in the low frequency image. Color in the high frequencies only looks almost the same as the fully gray version, because the high pass removes the average color of each region and what is left is mostly brightness detail. Color in the low frequency image makes Derek's skin look like skin, which helps him read as a person from far away. I used color in both for my final results, since the little bit of color in the high frequencies does not hurt and it is the simplest thing to do. If I had to pick one, it would be the low frequency image.</p>
+  </div>
+  <div data-compare="color_low" data-set="hybrids" data-left="both_gray" data-image="sam_dario"></div>
+</section>
+
+<section id="stacks">
+  <h2><span class="num">2.3</span>Gaussian and Laplacian stacks</h2>
+  <div class="writeup">
+    <p>A Gaussian stack is the same image blurred more and more at each level, without ever downsampling like we do in our project 1 pyramids. Since the image stays the same size, I double sigma at each level instead (2, 4, 8, 16). Each level of the Laplacian stack is the difference between two neighboring Gaussian levels, so it holds one band of frequencies. The last Laplacian level is just the last Gaussian level, so adding up the whole Laplacian stack gives back the original image.</p>
+  </div>
+<pre class="code"><code class="language-python">def gaussian_stack(image, levels, strength):
+    # just progressively apply stronger blurs on the previous blurred image
+    stack = [image]
+    for level in range(1, levels):
+        stack.append(blur_color(stack[level - 1], strength))
+        strength = strength * 2
+    return stack
+
+def laplacian_stack(image, levels, strength):
+    gaussians = gaussian_stack(image, levels, strength)
+    # subtract gaussian from one further on the stack to extract the "lost details" from each level
+    stack = []
+    for level in range(levels - 1):
+        stack.append(gaussians[level] - gaussians[level + 1])
+    stack.append(gaussians[levels - 1])
+    return stack</code></pre>
+
+  <h3>Apple</h3>
+  <div class="gallery five">
+    <p class="row-label">Gaussian stack</p>
+    <figure><img src="images/apple_gaussian_0.jpg" alt=""><figcaption>level 0</figcaption></figure>
+    <figure><img src="images/apple_gaussian_1.jpg" alt=""><figcaption>level 1</figcaption></figure>
+    <figure><img src="images/apple_gaussian_2.jpg" alt=""><figcaption>level 2</figcaption></figure>
+    <figure><img src="images/apple_gaussian_3.jpg" alt=""><figcaption>level 3</figcaption></figure>
+    <figure><img src="images/apple_gaussian_4.jpg" alt=""><figcaption>level 4</figcaption></figure>
+    <p class="row-label">Laplacian stack</p>
+    <figure><img src="images/apple_laplacian_0.jpg" alt=""><figcaption>level 0</figcaption></figure>
+    <figure><img src="images/apple_laplacian_1.jpg" alt=""><figcaption>level 1</figcaption></figure>
+    <figure><img src="images/apple_laplacian_2.jpg" alt=""><figcaption>level 2</figcaption></figure>
+    <figure><img src="images/apple_laplacian_3.jpg" alt=""><figcaption>level 3</figcaption></figure>
+    <figure><img src="images/apple_laplacian_4.jpg" alt=""><figcaption>level 4</figcaption></figure>
+  </div>
+
+  <h3>Orange</h3>
+  <div class="gallery five">
+    <p class="row-label">Gaussian stack</p>
+    <figure><img src="images/orange_gaussian_0.jpg" alt=""><figcaption>level 0</figcaption></figure>
+    <figure><img src="images/orange_gaussian_1.jpg" alt=""><figcaption>level 1</figcaption></figure>
+    <figure><img src="images/orange_gaussian_2.jpg" alt=""><figcaption>level 2</figcaption></figure>
+    <figure><img src="images/orange_gaussian_3.jpg" alt=""><figcaption>level 3</figcaption></figure>
+    <figure><img src="images/orange_gaussian_4.jpg" alt=""><figcaption>level 4</figcaption></figure>
+    <p class="row-label">Laplacian stack</p>
+    <figure><img src="images/orange_laplacian_0.jpg" alt=""><figcaption>level 0</figcaption></figure>
+    <figure><img src="images/orange_laplacian_1.jpg" alt=""><figcaption>level 1</figcaption></figure>
+    <figure><img src="images/orange_laplacian_2.jpg" alt=""><figcaption>level 2</figcaption></figure>
+    <figure><img src="images/orange_laplacian_3.jpg" alt=""><figcaption>level 3</figcaption></figure>
+    <figure><img src="images/orange_laplacian_4.jpg" alt=""><figcaption>level 4</figcaption></figure>
+  </div>
+</section>
+
+<section id="blend">
+  <h2><span class="num">2.4</span>Multiresolution blending</h2>
+  <div class="writeup">
+    <p>To blend two images I use a Laplacian stack for each image and a Gaussian stack for the mask. At every level the two Laplacians are combined using the mask from that level, and then all the levels are added up. The mask gets blurrier at each level, so fine detail switches from one image to the other over a narrow strip, while the overall color and brightness change over a wide one. That is what hides the seam. The mask stack is always one level blurrier than the image level it is paired with, so even the finest details switch over a soft edge instead of a hard cut.</p>
+  </div>
+<pre class="code"><code class="language-python">def mask_stack(mask, levels, strength):
+
+    gaussians = gaussian_stack(mask, levels + 1, strength)
+    stack = []
+    for level in range(1, levels + 1):
+        stack.append(gaussians[level])
+    return stack
+
+def blend_levels(image_a, image_b, mask, levels, strength):
+    laplacian_a = laplacian_stack(image_a, levels, strength)
+    laplacian_b = laplacian_stack(image_b, levels, strength)
+    masks = mask_stack(mask, levels, strength)
+    left = []
+    right = []
+    combined = []
+
+    for level in range(levels):
+        left.append(masks[level] * laplacian_a[level])
+        right.append((1 - masks[level]) * laplacian_b[level])
+        combined.append(left[level] + right[level])
+    return left, right, combined</code></pre>
+
+  <h3>The oraple</h3>
+  <div class="gallery three narrow">
+    <figure><img src="images/apple.jpg" alt="Apple"><figcaption>apple</figcaption></figure>
+    <figure><img src="images/orange.jpg" alt="Orange"><figcaption>orange</figcaption></figure>
+    <figure><img src="images/step_mask.jpg" alt="Mask"><figcaption>mask (vertical step)</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>This is my recreation of Figure 3.42 from Szeliski. Each row is one level of the Laplacian stack (high, middle and low frequencies), and the last row is the sum of all five levels. The columns are the apple times the mask, the orange times one minus the mask, and the two added together.</p>
+  </div>
+  <div class="gallery three narrow">
+    <figure><img src="images/oraple_apple_0.jpg" alt=""><figcaption>(a) apple, level 0</figcaption></figure>
+    <figure><img src="images/oraple_orange_0.jpg" alt=""><figcaption>(b) orange, level 0</figcaption></figure>
+    <figure><img src="images/oraple_blended_0.jpg" alt=""><figcaption>(c) blended, level 0</figcaption></figure>
+    <figure><img src="images/oraple_apple_2.jpg" alt=""><figcaption>(d) apple, level 2</figcaption></figure>
+    <figure><img src="images/oraple_orange_2.jpg" alt=""><figcaption>(e) orange, level 2</figcaption></figure>
+    <figure><img src="images/oraple_blended_2.jpg" alt=""><figcaption>(f) blended, level 2</figcaption></figure>
+    <figure><img src="images/oraple_apple_4.jpg" alt=""><figcaption>(g) apple, level 4</figcaption></figure>
+    <figure><img src="images/oraple_orange_4.jpg" alt=""><figcaption>(h) orange, level 4</figcaption></figure>
+    <figure><img src="images/oraple_blended_4.jpg" alt=""><figcaption>(i) blended, level 4</figcaption></figure>
+    <figure><img src="images/oraple_apple_sum.jpg" alt=""><figcaption>(j) apple, sum of all levels</figcaption></figure>
+    <figure><img src="images/oraple_orange_sum.jpg" alt=""><figcaption>(k) orange, sum of all levels</figcaption></figure>
+    <figure><img src="images/oraple.jpg" alt="Oraple"><figcaption>(l) the oraple</figcaption></figure>
+  </div>
+
+  <h3>Dario and Sam with a diagonal seam</h3>
+  <div class="writeup">
+    <p>I reused the aligned photos from the hybrid images, since the eyes and mouths already line up. The mask splits the image along the line y = x, from the bottom left corner to the top right corner, with Sam above the line and Dario below it. We can use the same settings oraple. 5 levels, starting at sigma 2. Cutting and pasting leaves a hard line across the face. With the blend, the skin tones and the two backgrounds fade into each other, and the seam across the forehead and cheek is hard to find. The glasses are a pretty obvious seam, but I think the effect looks pretty good like that.</p>
+  </div>
+  <div class="gallery five">
+    <figure><img src="images/sam_aligned.jpg" alt="Sam"><figcaption>Sam</figcaption></figure>
+    <figure><img src="images/dario_aligned.jpg" alt="Dario"><figcaption>Dario</figcaption></figure>
+    <figure><img src="images/face_mask.jpg" alt="Mask"><figcaption>mask</figcaption></figure>
+    <figure><img src="images/face_naive.jpg" alt="Cut and paste"><figcaption>cut and paste</figcaption></figure>
+    <figure><img src="images/sam_dario_blend.jpg" alt="Blended"><figcaption>multiresolution blend</figcaption></figure>
+  </div>
+  <div data-compare="blend" data-set="blends" data-image="sam_dario"></div>
+
+  <h3>The process for my favorite result</h3>
+  <div class="writeup">
+    <p>This is the same figure as the oraple, for Sam and Dario. Every level of every blend is also in the lab, under Blends.</p>
+  </div>
+  <div class="gallery three narrow">
+    <figure><img src="images/face_sam_0.jpg" alt=""><figcaption>Sam, level 0</figcaption></figure>
+    <figure><img src="images/face_dario_0.jpg" alt=""><figcaption>Dario, level 0</figcaption></figure>
+    <figure><img src="images/face_blended_0.jpg" alt=""><figcaption>blended, level 0</figcaption></figure>
+    <figure><img src="images/face_sam_2.jpg" alt=""><figcaption>Sam, level 2</figcaption></figure>
+    <figure><img src="images/face_dario_2.jpg" alt=""><figcaption>Dario, level 2</figcaption></figure>
+    <figure><img src="images/face_blended_2.jpg" alt=""><figcaption>blended, level 2</figcaption></figure>
+    <figure><img src="images/face_sam_4.jpg" alt=""><figcaption>Sam, level 4</figcaption></figure>
+    <figure><img src="images/face_dario_4.jpg" alt=""><figcaption>Dario, level 4</figcaption></figure>
+    <figure><img src="images/face_blended_4.jpg" alt=""><figcaption>blended, level 4</figcaption></figure>
+    <figure><img src="images/face_sam_sum.jpg" alt=""><figcaption>Sam, sum of all levels</figcaption></figure>
+    <figure><img src="images/face_dario_sum.jpg" alt=""><figcaption>Dario, sum of all levels</figcaption></figure>
+    <figure><img src="images/sam_dario_blend.jpg" alt=""><figcaption>final blend</figcaption></figure>
+  </div>
+  <div class="writeup">
+    <p>Swapping the two sides, with Dario above the line and Sam below it:</p>
+  </div>
+  <div class="gallery one" style="max-width: 460px;">
+    <figure><img src="images/dario_sam_blend.jpg" alt="Swapped blend"><figcaption>Dario on top, Sam on the bottom</figcaption></figure>
+  </div>
+
+  <h3>Yann LeCun and Geoffrey Hinton with an oval mask</h3>
+  <div class="writeup">
+    <p>For the irregular mask I put Yann LeCun's face on Geoffrey Hinton's head. I warped LeCun's photo so his pupils and mouth land on Hinton's, the same way I aligned Sam and Dario. The mask is an oval built from Hinton's three points.</p>
+  </div>
+  <div class="gallery five">
+    <figure><img src="images/hinton.jpg" alt="Hinton"><figcaption>Hinton</figcaption></figure>
+    <figure><img src="images/lecun_aligned.jpg" alt="LeCun aligned"><figcaption>LeCun, aligned</figcaption></figure>
+    <figure><img src="images/lecun_mask.jpg" alt="Mask"><figcaption>mask</figcaption></figure>
+    <figure><img src="images/lecun_hinton_naive.jpg" alt="Cut and paste"><figcaption>cut and paste</figcaption></figure>
+    <figure><img src="images/lecun_hinton_blend.jpg" alt="Blended"><figcaption>multiresolution blend</figcaption></figure>
+  </div>
+  <div data-compare="blend" data-set="blends" data-image="lecun_hinton"></div>
+
+  <h3>Bells &amp; whistles: color</h3>
+  <div class="writeup">
+    <p>All of our images for 2.4 support color. In the LeCun and Hinton blend, I was pretty unhappy with the color seam we were seeing. This can be by design for some images, or it could be fixed with better image choices. However, I really wanted to make this combo of LeCun and Hinton work. We know that most of the valuable color data lies in the low frequencies. So, for this image, what if I try and apply the color from Hinton to these low frequencies signals in LeCun? I make the low frequency parts of the stack for lecun equal the average brightness across Lecuns color channels + Hinton's color, which is his level subtracted by the average of the color channels. I was actually suprisingly happy with this effect. It still has a bit of a seam, but matching the colors improves it a lot, and expands the amount of pictures that work well with this blending technique when you want to minimize a seam, and care more about the high frequency features, such as facial details.</p>
+  </div>
+  <div class="gallery two" style="max-width: 760px;">
+    <figure><img src="images/lecun_hinton_blend.jpg" alt="Blend"><figcaption>multiresolution blend</figcaption></figure>
+    <figure><img src="images/lecun_hinton_color.jpg" alt="Blend with Hinton's color in the coarse levels"><figcaption>Hinton's color in levels 3 and 4</figcaption></figure>
+  </div>
+</section>
+
+<section id="learned">
+  <h2><span class="num">3</span>The most important thing I learned</h2>
+  <div class="writeup">
+    <p>The most important thing from this project is that images can be split into frequencies, and its actually useful to do so. There are many advantages to viewing images in relation to their frequencies, in a way that would not be intuitive by looking at the raw pixel values. It also shows the usefulness and applicability of convolutions for digital image processing. Blending and hybrid images were fun, but I think that the relationship between high and low frequency features in images is important, especially as we move in to the machine learning portion of the course. Much of this will be features of images learned by our models, so understanding how to do this by hand will let us interpret them better.</p>
+  </div>
+</section>
+
+<section id="llm">
+  <h2><span class="num">4</span>LLM-generated version (not my work)</h2>
+  <div class="writeup">
+    <p>Like in Project 1, I had Claude Opus 5.5 set to high reasoning in claude code test a version of complete whole project. I think this a worthwhile experiment because I think it is interesting to see what differences come up, and which techniques it handles in a better way vs. a less effective or aesthetic way. I am definitely much more impressed by this output compared to what was done for Fable 5.1. Partially, there was more room for creative freedom, but also Claude Opus 5.5 is especially capable at visual design. I was a little suprised by the result of section 2.2 with the Campanile and Starry Night. I actually went back through the logs to make sure it didn't take this idea from github or a previous computer vision student. As far as I could tell it was not, but it is worth looking at least at section 2.4 there. It used quite a few extra techniques beyond just simple irregular masks.</p>
+  </div>
+  <details class="llm-details">
+    <summary>Show the LLM-generated version <span>everything inside this box was made by an LLM</span></summary>
+    <div class="llm-label">LLM-generated content. Everything below, including the code, image choices, parameters, figures and text, was produced by Claude, not by me. None of it is part of my submission above.</div>
+    <iframe class="llm-frame" data-src="llm/index.html" title="LLM-generated version of Project 2"></iframe>
+    <p class="hint"><a href="llm/index.html" target="_blank" rel="noopener">Open the LLM-generated version in its own tab</a></p>
+    <div class="llm-label">End of LLM-generated content.</div>
+  </details>
+</section>
+
+</main>
+<script src="data/john.js?v=4"></script>
+<script src="captions.js?v=5"></script>
+<script src="lab.js?v=3"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script>
+  // the LLM version is a separate site, only loaded once its box is opened
+  document.querySelectorAll("details.llm-details").forEach(function (box) {
+    box.addEventListener("toggle", function () {
+      var frame = box.querySelector("iframe");
+      if (box.open && !frame.getAttribute("src")) frame.setAttribute("src", frame.dataset.src);
+    });
+  });
+</script>
+</body>
+</html>
