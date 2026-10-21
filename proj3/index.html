@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fun with Flow Models — CS280A Project 3</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .part-title { font-family: var(--serif); font-weight: 600; font-size: 1.5rem; color: var(--ox); margin: 64px 0 0; letter-spacing: 0.02em; }
+  .gallery .todo { min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+  .anim { margin: 24px auto; }
+  .anim-box { position: relative; width: min(100%, 420px); aspect-ratio: 1; margin: 0 auto; overflow: hidden; border-radius: 6px; }
+  .anim-box .tile { position: absolute; width: 50%; height: 50%; background-size: 200% 200%; transition: transform 0.8s ease-in-out; }
+  .anim-box .tl { left: 0; top: 0; background-position: 0 0; }
+  .anim-box .tr { left: 50%; top: 0; background-position: 100% 0; }
+  .anim-box .bl { left: 0; top: 50%; background-position: 0 100%; }
+  .anim-box .br { left: 50%; top: 50%; background-position: 100% 100%; }
+  .anim-box .base, .anim-box .spin { position: absolute; inset: 0; background-size: cover; }
+  .anim-box .spin { clip-path: circle(31.25% at 50% 50%); transition: transform 0.8s ease-in-out; }
+  .anim.flipped .tl { transform: translate(100%, 100%); }
+  .anim.flipped .tr { transform: translate(-100%, 100%); }
+  .anim.flipped .bl { transform: translate(100%, -100%); }
+  .anim.flipped .br { transform: translate(-100%, -100%); }
+  .anim.flipped .spin { transform: rotate(180deg); }
+  .anim-labels { display: grid; margin-top: 10px; text-align: center; font-weight: 600; }
+  .anim-labels span { grid-area: 1 / 1; transition: opacity 0.8s ease-in-out; }
+  .anim-labels .lb { opacity: 0; }
+  .anim.flipped .la { opacity: 0; }
+  .anim.flipped .lb { opacity: 1; }
+  .anim-btn { display: block; margin: 10px auto 0; padding: 6px 18px; font: inherit; font-size: 0.9rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; opacity: 0.85; }
+  .anim-btn:hover { opacity: 1; }
+  .eq { font-family: var(--serif); font-size: 1.2rem; text-align: center; margin: 20px 0 24px; line-height: 1.6; }
+  .side { display: none; }
+  @media (min-width: 1000px) {
+    body { padding-left: 220px; }
+    .side { display: block; position: fixed; top: 0; left: 0; bottom: 0; width: 220px; overflow-y: auto; padding: 24px 14px 40px; border-right: 1px solid var(--rule); background: var(--paper); font-size: 0.82rem; }
+  }
+  .side p { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox); margin: 18px 0 6px 10px; }
+  .side a { display: block; color: var(--ink-2); text-decoration: none; padding: 3px 8px; border-left: 2px solid transparent; line-height: 1.35; }
+  .side a span { font-family: var(--mono); font-size: 0.72rem; color: var(--ox); margin-right: 6px; }
+  .side a.sub { padding-left: 24px; font-size: 0.78rem; }
+  .side a:hover, .side a.on { color: var(--ink); border-left-color: var(--ox); }
+  section, h3[id] { scroll-margin-top: 16px; }
+  .eq .note { display: block; font-family: inherit; font-size: 0.85rem; opacity: 0.7; margin-top: 2px; }
+</style>
+</head>
+<body>
+<nav class="side">
+<p>part a</p>
+<a href="#a11"><span>1.1</span>Constructing noisy training inputs</a>
+<a href="#a12"><span>1.2</span>Classical denoising</a>
+<a href="#a13"><span>1.3</span>One-step denoising</a>
+<a href="#a14"><span>1.4</span>Visualizing velocity</a>
+<a href="#a15"><span>1.5</span>Iterative denoising with Euler sampling</a>
+<a href="#a16"><span>1.6</span>Generating images from noise</a>
+<a href="#a21"><span>2.1</span>Classifier-free guidance</a>
+<a href="#a31"><span>3.1</span>Image-to-image editing</a>
+<a href="#a32"><span>3.2</span>Text-guided image editing</a>
+<a href="#a33"><span>3.3</span>Visual anagrams</a>
+<a href="#a34"><span>3.4</span>Hybrid images</a>
+<a href="#abells"><span>B&amp;W</span>Bells &amp; whistles (CS280A)</a>
+<a class="sub" href="#abells-anagrams">more anagrams</a>
+<a class="sub" href="#abells-logo">logo</a>
+<p>part b</p>
+<a href="#b11"><span>B1.1</span>Implementing the UNet</a>
+<a href="#b12"><span>B1.2</span>Training a single-step denoiser</a>
+<a href="#b123"><span>B1.2.3</span>Denoising pure noise</a>
+<a href="#b2"><span>B2.1-2.3</span>Time-conditioned flow matching</a>
+<a href="#b24"><span>B2.4-2.6</span>Class-conditioned flow matching</a>
+<a href="#bbells"><span>B&amp;W</span>Bells &amp; whistles (CS280A)</a>
+<a class="sub" href="#bcorrection">correction training</a>
+<a class="sub" href="#bfashion">fashion mnist</a>
+<a href="#learned"><span>End</span>The most important thing I learned</a>
+</nav>
+<header class="site">
+  <p class="kicker">CS280A · Project 3 · Fall 2026</p>
+  <h1>Project 3: Fun with Flow Models</h1>
+  <p class="sub">John Heibel</p>
+</header>
+<nav class="toc">
+  <a href="#a11">A 1.1</a><a href="#a12">1.2</a><a href="#a13">1.3</a><a href="#a14">1.4</a><a href="#a15">1.5</a><a href="#a16">1.6</a><a href="#a21">2.1</a><a href="#a31">3.1</a><a href="#a32">3.2</a><a href="#a33">3.3</a><a href="#a34">3.4</a><a href="#abells">A B&amp;W</a><a href="#b11">B 1.1</a><a href="#b12">1.2</a><a href="#b123">1.2.3</a><a href="#b2">2.1-2.3</a><a href="#b24">2.4-2.6</a><a href="#bbells">B B&amp;W</a><a href="#learned">what i learned</a>
+</nav>
+<main>
+
+<p class="part-title">part a</p>
+<section id="a11">
+  <h2><span class="num">1.1</span>Constructing noisy training inputs</h2>
+<div class="writeup">
+  <p>Training inputs are just a mix of noise and the clean image. At t = 0.25 you can barely make out the scene, and by 0.75 it is mostly clean. The same noise is used for all three so the only thing changing is how much of the image is left.</p>
+</div>
+<div class="eq">x<sub>t</sub> = (1 &minus; t) &epsilon; + t x<sub>1</sub><span class="note">t = 0 is noise, t = 1 is the clean image</span></div>
+<div class="gallery one">
+<figure><img src="images/training_inputs.png" alt="og, then t=0.25, 0.5, 0.75"><figcaption>og, then t=0.25, 0.5, 0.75</figcaption></figure>
+</div>
+</section>
+
+<section id="a12">
+  <h2><span class="num">1.2</span>Classical denoising</h2>
+<div class="writeup">
+  <p>You can use Gaussian blur to remove noise, but it has no idea what the image is supposed to look like. It can only smooth things out, so the noise and the detail go away together. The noisier the input, the more blur it needs, but the best result is a smudge.</p>
+</div>
+<div class="eq">x&#770;<sub>1</sub> = G<sub>&sigma;</sub> &lowast; (x<sub>t</sub> / t)</div>
+<div class="gallery three">
+<figure><img src="images/blur_0.25.png" alt="t=0.25"><figcaption>t=0.25</figcaption></figure>
+<figure><img src="images/blur_0.5.png" alt="t=0.50"><figcaption>t=0.50</figcaption></figure>
+<figure><img src="images/blur_0.75.png" alt="t=0.75"><figcaption>t=0.75</figcaption></figure>
+</div>
+</section>
+
+<section id="a13">
+  <h2><span class="num">1.3</span>One-step denoising</h2>
+<div class="writeup">
+  <p>The one step estimate is already much better than blurring, because the model has learned what real images look like. At t = 0.75 it is very close to the original. At t = 0.25 it has to guess most of the image at once, so it comes out blurry and loses the fine detail.</p>
+</div>
+<div class="eq">x&#770;<sub>1</sub> = x<sub>t</sub> + (1 &minus; t) v<sub>&theta;</sub>(x<sub>t</sub>, t, c)</div>
+<div class="gallery one">
+<figure><img src="images/one_step_0.25.png" alt="t=0.25"><figcaption>t=0.25</figcaption></figure>
+<figure><img src="images/one_step_0.5.png" alt="t=0.50"><figcaption>t=0.50</figcaption></figure>
+<figure><img src="images/one_step_0.75.png" alt="t=0.75"><figcaption>t=0.75</figcaption></figure>
+</div>
+</section>
+
+<section id="a14">
+  <h2><span class="num">1.4</span>Visualizing velocity</h2>
+<div class="writeup">
+  <p>The predicted update and the true update look very similar overall, the model gets the layout and colors right. The error is mostly around edges and fine details like my face and the railing, and it gets worse as t gets smaller and there is less of the image left to go off of.</p>
+</div>
+<div class="eq">E<sub>t</sub> = &radic;mean<sub>RGB</sub>[ (1 &minus; t)(v&#770;<sub>t</sub> &minus; v<sub>gt</sub>) ]&sup2;<span class="note">v<sub>gt</sub> = x<sub>1</sub> &minus; &epsilon;</span></div>
+<div class="gallery two">
+<figure><img src="images/velocity_original.png" alt="og"><figcaption>og</figcaption></figure>
+</div>
+<div class="gallery one">
+<figure><img src="images/velocity_0.25.png" alt="t=0.25"><figcaption>t=0.25</figcaption></figure>
+<figure><img src="images/velocity_0.50.png" alt="t=0.50"><figcaption>t=0.50</figcaption></figure>
+<figure><img src="images/velocity_0.75.png" alt="t=0.75"><figcaption>t=0.75</figcaption></figure>
+</div>
+</section>
+
+<section id="a15">
+  <h2><span class="num">1.5</span>Iterative denoising with Euler sampling</h2>
+<div class="writeup">
+  <p>Taking a lot of small steps instead of one big one gives a much sharper result, and out of blur, one step and Euler on the same input, Euler looks the most like a real photo. Interestingly, it does not have the lowest error. The MSE to my original was 0.035 for blur, 0.010 for one step and 0.012 for Euler. One step is a little blurry, and blurry guesses score well on MSE because they hedge between possibilities. Euler commits to sharp details, and since the model has never seen my exact picture, some of those details are not the real ones.</p>
+</div>
+<div class="eq">x<sub>t+h</sub> = x<sub>t</sub> + h v<sub>&theta;</sub>(x<sub>t</sub>, t, c)<span class="note">h = 0.02</span></div>
+<div class="gallery one">
+<figure><img src="images/trajectory.png" alt="euler from t=0.5"><figcaption>euler from t=0.5</figcaption></figure>
+<figure><img src="images/comparison.png" alt="og vs blur vs one step vs euler"><figcaption>og vs blur vs one step vs euler</figcaption></figure>
+</div>
+<table class="offsets narrow"><thead><tr><th>method (t = 0.5 input)</th><th>MSE to original</th></tr></thead><tbody><tr><td>blur</td><td>0.0349</td></tr><tr><td>one_step</td><td>0.0103</td></tr><tr><td>euler</td><td>0.0123</td></tr></tbody></table>
+</section>
+
+<section id="a16">
+  <h2><span class="num">1.6</span>Generating images from noise</h2>
+<div class="writeup">
+  <p>All five samples came out as photos of people, which says a lot about what this model thinks a high quality photo is. Without guidance they are pretty rough, a couple of the faces are missing or distorted, like seed 180 where the person has no face.</p>
+</div>
+<div class="eq">x<sub>0</sub> ~ &Nscr;(0, I) &nbsp;&rarr;&nbsp; Euler steps from t = 0 to t = 1</div>
+<div class="gallery one">
+<figure><img src="images/conditional_samples.png" alt="seeds 180-184"><figcaption>seeds 180-184</figcaption></figure>
+</div>
+</section>
+
+<section id="a21">
+  <h2><span class="num">2.1</span>Classifier-free guidance</h2>
+<div class="writeup">
+  <p>With CFG at w = 7, every sample is a clean, front facing portrait with no distortions, but we lose variety and they all look like the same kind of stock photo. You can still see the starting noise in some of them, seed 182 has a hand on the cheek in both versions.</p>
+</div>
+<div class="eq">v<sub>cfg</sub> = v<sub>c</sub> + w (v<sub>c</sub> &minus; v<sub>u</sub>)<span class="note">w = 7</span></div>
+<div class="gallery one">
+<figure><img src="images/conditional_samples.png" alt="no cfg"><figcaption>no cfg</figcaption></figure>
+<figure><img src="images/cfg_samples.png" alt="cfg w=7"><figcaption>cfg w=7</figcaption></figure>
+</div>
+</section>
+
+<section id="a31">
+  <h2><span class="num">3.1</span>Image-to-image editing</h2>
+<div class="writeup">
+  <p>Starting earlier gives the model more freedom, and starting later keeps more of the original. I think the interesting part is what the model holds on to. At t = 0.02 it only keeps the rough colors and shapes, so it kind of makes up something that fits them. My black cat turns into a black phone in someone's hand, and Oski turns into a woman's face. From 0.04 to 0.14 it's the right scene, but a generic version of it. The Campanile is a plain white obelisk, and I get swapped out for a different guy in a black t-shirt. The real details, like the Campanile's windows and the tower behind me, only come back around 0.25, and by 0.5 it's pretty much the original.</p>
+  <p>I tried a few drawings and was struggling to get good results. I think it was interesting how the lines got wiped out, even though I tried to draw them pretty bold. A pencil line is thin, so the noise wipes it out first, and from 0.04 to 0.14 the model just turns what's left into blank paper. At 0.25 and up the lines survive, but a photo of a sketch already counts as a high quality photo, so it just stays a sketch. I think a drawing with big filled in shapes would have worked a lot better.</p>
+</div>
+<div class="eq">x<sub>t<sub>0</sub></sub> = (1 &minus; t<sub>0</sub>) &epsilon; + t<sub>0</sub> y, &nbsp;then guided Euler steps to t = 1</div>
+<h3>campanile + my pics</h3>
+<div class="gallery one">
+<figure><img src="images/edit_campanile.png" alt="campanile"><figcaption>campanile</figcaption></figure>
+<figure><img src="images/edit_my_image_1.png" alt="me"><figcaption>me</figcaption></figure>
+<figure><img src="images/edit_my_image_2.png" alt="my cat"><figcaption>my cat</figcaption></figure>
+</div>
+<h3>web pic + drawings</h3>
+<div class="gallery one">
+<figure><img src="images/edit_web_image.png" alt="oski"><figcaption>oski</figcaption></figure>
+<figure><img src="images/edit_drawing_1.png" alt="drawing 1"><figcaption>drawing 1</figcaption></figure>
+<figure><img src="images/edit_drawing_2.png" alt="drawing 2"><figcaption>drawing 2</figcaption></figure>
+</div>
+</section>
+
+<section id="a32">
+  <h2><span class="num">3.2</span>Text-guided image editing</h2>
+<div class="writeup">
+  <p>For the Campanile I asked for "a menacing obelisk under a blue and yellow sky". I think this kind of did accomplish what I was looking for in a pretty comedic way, especially at t = 0.06 and t = 0.10, where it grows an evil face at the top. It was exactly what I was looking for. Then it quickly devolves back into the original image once we start from a later step.</p>
+  <p>For my picture I asked for "an empty balcony overlooking a city". I wanted to test if this model was able to remove me from an image, and to a certain extent it did. At t = 0.02 it did generate a new balcony with no human in it. The only problem is that it started at such a high noise level that it really didn't maintain much of the original image, so it's now kind of Roman style instead of UC Berkeley. I think that if I was masked out and then used the model to inpaint, it would have worked quite well. But unfortunately, that's not the test.</p>
+  <p>I do think swapping the color of my cat with "an orange cat" worked fairly well. At t = 0.04 and t = 0.06 it still keeps a few of the recognizable structures from my cat. It's definitely not perfect. I think these models struggle with image editing.</p>
+</div>
+<div class="eq">same as 3.1, with c = my prompt instead of &ldquo;a high quality photo&rdquo;</div>
+<div class="gallery one">
+<figure><img src="images/text_edit_campanile.png" alt="campanile"><figcaption>campanile</figcaption></figure>
+<figure><img src="images/text_edit_my_image_1.png" alt="me"><figcaption>me</figcaption></figure>
+<figure><img src="images/text_edit_my_image_2.png" alt="my cat"><figcaption>my cat</figcaption></figure>
+</div>
+</section>
+
+<section id="a33">
+  <h2><span class="num">3.3</span>Visual anagrams</h2>
+<div class="writeup">
+  <p>The image gets pulled toward both prompts at once, one right side up and one upside down. This took some iteration. My first tries at night or in a dark room came out almost completely black. Both views share the same pixels, so the two prompts need to share the same colors and lighting. Once I switched to daylight versions, things started to work. I think the robot / old man pair turned out the best. The robot's head becomes the old man's beard and mouth, and both views read really well. The man in a green field and the man at a desk in a green room also works, the white clouds flip into the papers on the desk. The desk view is a little weaker though, you can see the upside down face of the man in the field sitting on the desk. I also kept the two example pairs from the spec, and the campfire one has the same problem, there's an upside down face in the fire.</p>
+</div>
+<div class="eq">v = &frac12; [ v<sub>cfg</sub>(x<sub>t</sub>, p<sub>1</sub>) + F( v<sub>cfg</sub>(F(x<sub>t</sub>), p<sub>2</sub>) ) ]<span class="note">F flips the image 180&deg;</span></div>
+<div class="gallery one">
+<figure><img src="images/anagram_views_0.png" alt="village / horse (spec example)"><figcaption>village / horse (spec example)</figcaption></figure>
+<figure><img src="images/anagram_views_1.png" alt="robot / old man"><figcaption>robot / old man</figcaption></figure>
+<figure><img src="images/anagram_views_2.png" alt="old man / campfire (spec example)"><figcaption>old man / campfire (spec example)</figcaption></figure>
+<figure><img src="images/anagram_views_3.png" alt="man in a field / man at a desk"><figcaption>man in a field / man at a desk</figcaption></figure>
+</div>
+</section>
+
+<section id="a34">
+  <h2><span class="num">3.4</span>Hybrid images</h2>
+<div class="writeup">
+  <p>Same idea as the hybrid images from project 2, the far away prompt controls the low frequencies and the close up prompt controls the high frequencies. The difference is that it happens during generation, so the model can make the two fit together instead of just overlaying two finished images.</p>
+  <p>I think the cat image turned out pretty well, because if you really squint your eyes, it does kind of look like a human face, so I was happy with that one. The bear one could have turned out better. I think it shows a pretty clear failure case, where the two prompts get merged into one image, a tree shaped bear, rather than being two separate images in one. I also kept the two example pairs from the spec.</p>
+</div>
+<div class="eq">v = G<sub>&sigma;</sub> &lowast; v<sub>1</sub> + (v<sub>2</sub> &minus; G<sub>&sigma;</sub> &lowast; v<sub>2</sub>)<span class="note">&sigma; = 16; prompt 1 far away, prompt 2 up close</span></div>
+<div class="gallery two">
+<figure><img src="images/hybrid_0.png" alt="up close: bear"><figcaption>up close: bear</figcaption></figure>
+<figure><img src="images/hybrid_0.png" alt="far away: pine tree" style="width:64px;height:64px;"><figcaption>far away: pine tree</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/hybrid_1.png" alt="up close: cat"><figcaption>up close: cat</figcaption></figure>
+<figure><img src="images/hybrid_1.png" alt="far away: human face" style="width:64px;height:64px;"><figcaption>far away: human face</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/hybrid_2.png" alt="up close: waterfall (spec example)"><figcaption>up close: waterfall (spec example)</figcaption></figure>
+<figure><img src="images/hybrid_2.png" alt="far away: skull" style="width:64px;height:64px;"><figcaption>far away: skull</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/hybrid_3.png" alt="up close: forest (spec example)"><figcaption>up close: forest (spec example)</figcaption></figure>
+<figure><img src="images/hybrid_3.png" alt="far away: cat" style="width:64px;height:64px;"><figcaption>far away: cat</figcaption></figure>
+</div>
+</section>
+
+<section id="abells">
+  <h2><span class="num">B&amp;W</span>Bells &amp; whistles (CS280A)</h2>
+<div class="writeup">
+  <p>This is something that took me a number of iterations to do. Implementing the transforms from the Visual Anagrams paper was somewhat straightforward: a jigsaw that swaps the corners, and a spin of just the inner circle. I think the jigsaw swap and the circular spin look quite good, and I'm really happy with how they look in the animations. But I tried a number of prompts, and it definitely takes some iteration. My first tries with flat cartoon prompts did not read very well. So I kind of had to take some advice from the paper and stick to oil paintings with faces and animals, because the model was much stronger at generating those. I really like both the bear / tree and the cat / computer examples. They read quite well in both views. I think the spinning face, the old man crying that spins into a young man smiling, sort of works. The model was better at generating the smiling figure, and the crying figure is still fairly distorted. I tried a number of iterations there and couldn't get something amazing, but I think it still works.</p>
+  <p>As for the course logo, that took some trial and error. Generating it from scratch did not work well at all. We kind of forget with all the models we have these days, but a small diffusion model cannot spell. So I had to start from a base image with a simple script CS180 on a yellow circle, then tried a number of styles at t = 0.15. I think pixel art ended up the most coherent, but knitted also looks pretty good. I think this sort of texture application is nearing the edge of what these smaller diffusion models can do, but I'm happy with how it turned out. With these simple styles, we can start with more of the original image and still get a coherent, nicely edited image at the end.</p>
+</div>
+<div class="eq">v = &frac12; [ v<sub>cfg</sub>(x<sub>t</sub>, p<sub>1</sub>) + V<sup>&minus;1</sup>( v<sub>cfg</sub>(V(x<sub>t</sub>), p<sub>2</sub>) ) ]<span class="note">V = jigsaw (swap corners) or spin the middle circle</span></div>
+<pre class="code"><code class="language-python">def jigsaw(x):
+    return torch.roll(x, (256, 256), dims=(-2, -1))</code></pre>
+<pre class="code"><code class="language-python">def spin_center(x):
+    return center_mask * rotate180(x) + (1 - center_mask) * x</code></pre>
+<h3 id="abells-anagrams">more anagrams</h3>
+<figure class="anim"><div class="anim-box">
+  <div class="tile tl" style="background-image:url('images/anagram_jigsaw_0_181.png')"></div>
+  <div class="tile tr" style="background-image:url('images/anagram_jigsaw_0_181.png')"></div>
+  <div class="tile bl" style="background-image:url('images/anagram_jigsaw_0_181.png')"></div>
+  <div class="tile br" style="background-image:url('images/anagram_jigsaw_0_181.png')"></div>
+</div>
+<div class="anim-labels"><span class="la">a bear</span><span class="lb">a tree</span></div>
+<button class="anim-btn" type="button">&#9654; play</button>
+<figcaption>jigsaw, bear / tree</figcaption></figure>
+<div class="gallery one">
+<figure><img src="images/anagram_jigsaw_0_181_views.png" alt="bear / tree, before and after the jigsaw"><figcaption>bear / tree, before and after the jigsaw</figcaption></figure>
+</div>
+<figure class="anim"><div class="anim-box">
+  <div class="tile tl" style="background-image:url('images/anagram_jigsaw_1_182.png')"></div>
+  <div class="tile tr" style="background-image:url('images/anagram_jigsaw_1_182.png')"></div>
+  <div class="tile bl" style="background-image:url('images/anagram_jigsaw_1_182.png')"></div>
+  <div class="tile br" style="background-image:url('images/anagram_jigsaw_1_182.png')"></div>
+</div>
+<div class="anim-labels"><span class="la">a cat</span><span class="lb">a computer</span></div>
+<button class="anim-btn" type="button">&#9654; play</button>
+<figcaption>jigsaw, cat / computer</figcaption></figure>
+<div class="gallery one">
+<figure><img src="images/anagram_jigsaw_1_182_views.png" alt="cat / computer, before and after the jigsaw"><figcaption>cat / computer, before and after the jigsaw</figcaption></figure>
+</div>
+<figure class="anim"><div class="anim-box">
+  <div class="base" style="background-image:url('images/anagram_spin_182.png')"></div>
+  <div class="spin" style="background-image:url('images/anagram_spin_182.png')"></div>
+</div>
+<div class="anim-labels"><span class="la">an old man crying</span><span class="lb">a young man smiling</span></div>
+<button class="anim-btn" type="button">&#9654; play</button>
+<figcaption>spin the middle, old man crying / young man smiling</figcaption></figure>
+<div class="gallery one">
+<figure><img src="images/anagram_spin_182_views.png" alt="old man crying / young man smiling, before and after spinning the middle"><figcaption>old man crying / young man smiling, before and after spinning the middle</figcaption></figure>
+</div>
+<h3 id="abells-logo">logo</h3>
+<div class="gallery one">
+<figure><img src="images/course_logo.png" alt="logo, edit at t=0.15 with 4 prompts"><figcaption>logo, edit at t=0.15 with 4 prompts</figcaption></figure>
+</div>
+</section>
+
+
+<p class="part-title">part b</p>
+<section id="b11">
+  <h2><span class="num">B1.1</span>Implementing the UNet</h2>
+<div class="writeup">
+  <p>The UNet shrinks the image down to a single pixel and back up, with skip connections at each size so the fine detail does not have to squeeze through the middle.</p>
+</div>
+<div class="eq">D<sub>&theta;</sub> : &#8477;<sup>1&times;28&times;28</sup> &rarr; &#8477;<sup>1&times;28&times;28</sup></div>
+</section>
+
+<section id="b12">
+  <h2><span class="num">B1.2</span>Training a single-step denoiser</h2>
+<div class="writeup">
+  <p>The digit gets harder to read as sigma goes up. After training at sigma = 0.5, the outputs are a little blurry after 1 epoch and sharp after 5, and the loss drops quickly before flattening out.</p>
+  <p>On noise levels it was not trained on, it does fine up to about 0.6. At 0.8 and 1.0 it starts adding strokes that are not in the digit, since it never saw that much noise.</p>
+</div>
+<div class="eq">z = x + &sigma; &epsilon;, &nbsp; L = &Vert;D<sub>&theta;</sub>(z) &minus; x&Vert;&sup2;<span class="note">trained at &sigma; = 0.5</span></div>
+<div class="gallery one">
+<figure><img src="images/noising.png" alt="sigma 0 to 1"><figcaption>sigma 0 to 1</figcaption></figure>
+</div>
+<h3>training</h3>
+<div class="gallery one">
+<figure><img src="images/denoiser_loss.png" alt="loss"><figcaption>loss</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/denoise_epoch1.png" alt="epoch 1"><figcaption>epoch 1</figcaption></figure>
+<figure><img src="images/denoise_epoch5.png" alt="epoch 5"><figcaption>epoch 5</figcaption></figure>
+</div>
+<h3>ood</h3>
+<div class="gallery one">
+<figure><img src="images/ood.png" alt="sigma 0 to 1"><figcaption>sigma 0 to 1</figcaption></figure>
+</div>
+</section>
+
+<section id="b123">
+  <h2><span class="num">B1.2.3</span>Denoising pure noise</h2>
+<div class="writeup">
+  <p>When the input is pure noise, every output is the same blurry blob that looks like an average of all the digits. With MSE loss, the best guess when you have no information is the average of every possible answer, and pure noise tells the model nothing about which digit it should be. The loss also flattens out almost right away, since there is nothing else for it to learn.</p>
+</div>
+<div class="eq">L = &Vert;D<sub>&theta;</sub>(&epsilon;) &minus; x&Vert;&sup2; &nbsp;&rarr;&nbsp; best answer is the average digit</div>
+<div class="gallery one">
+<figure><img src="images/pure_noise_loss.png" alt="loss"><figcaption>loss</figcaption></figure>
+<figure><img src="images/pure_epoch1.png" alt="epoch 1"><figcaption>epoch 1</figcaption></figure>
+<figure><img src="images/pure_epoch5.png" alt="epoch 5"><figcaption>epoch 5</figcaption></figure>
+</div>
+</section>
+
+<section id="b2">
+  <h2><span class="num">B2.1-2.3</span>Time-conditioned flow matching</h2>
+<div class="writeup">
+  <p>Giving the UNet the time t lets it know how noisy its input is, and turns it into a model that can generate digits from scratch. After 1 epoch the samples are scribbles, and after 10 most are readable digits, but a few still do not look like anything.</p>
+</div>
+<div class="eq">x<sub>t</sub> = (1 &minus; t) x<sub>0</sub> + t x<sub>1</sub>, &nbsp; L = &Vert;u<sub>&theta;</sub>(x<sub>t</sub>, t) &minus; (x<sub>1</sub> &minus; x<sub>0</sub>)&Vert;&sup2;</div>
+<div class="gallery one">
+<figure><img src="images/time_loss.png" alt="loss"><figcaption>loss</figcaption></figure>
+<figure><img src="images/time_epoch1.png" alt="epoch 1"><figcaption>epoch 1</figcaption></figure>
+<figure><img src="images/time_epoch5.png" alt="epoch 5"><figcaption>epoch 5</figcaption></figure>
+<figure><img src="images/time_epoch10.png" alt="epoch 10"><figcaption>epoch 10</figcaption></figure>
+</div>
+</section>
+
+<section id="b24">
+  <h2><span class="num">B2.4-2.6</span>Class-conditioned flow matching</h2>
+<div class="writeup">
+  <p>Adding the digit label lets me choose what to generate. Dropping the label 10% of the time during training means the same model can also generate without one, which is what CFG needs. After 10 epochs every column is clearly the digit it was asked for, a big jump over the time only model.</p>
+</div>
+<div class="eq">u = u<sub>&theta;</sub>(x<sub>t</sub>, t, &empty;) + &gamma; (u<sub>&theta;</sub>(x<sub>t</sub>, t, c) &minus; u<sub>&theta;</sub>(x<sub>t</sub>, t, &empty;))<span class="note">&gamma; = 5, c dropped 10% of the time in training</span></div>
+<div class="gallery one">
+<figure><img src="images/class_loss.png" alt="loss"><figcaption>loss</figcaption></figure>
+<figure><img src="images/class_epoch1.png" alt="epoch 1"><figcaption>epoch 1</figcaption></figure>
+<figure><img src="images/class_epoch5.png" alt="epoch 5"><figcaption>epoch 5</figcaption></figure>
+<figure><img src="images/class_epoch10.png" alt="epoch 10"><figcaption>epoch 10</figcaption></figure>
+</div>
+<h3>no scheduler</h3>
+<div class="writeup">
+  <p>Without the scheduler I used a constant learning rate of 1e-3, which is where the scheduler ends up anyway. Staying at 1e-2 would keep taking big noisy steps, and 1e-3 the whole time is steady enough to get there in the same 10 epochs. The results look just as good as the scheduled version.</p>
+</div>
+<div class="gallery one">
+<figure><img src="images/class_no_scheduler_loss.png" alt="loss, lr 1e-3"><figcaption>loss, lr 1e-3</figcaption></figure>
+<figure><img src="images/class_no_scheduler.png" alt="epoch 10"><figcaption>epoch 10</figcaption></figure>
+</div>
+</section>
+
+<section id="bbells">
+  <h2><span class="num">B&amp;W</span>Bells &amp; whistles (CS280A)</h2>
+<div class="writeup">
+  <p>To improve the time only model, I let t shift the features as well as scale them, like the class model does. At 10 epochs this looked about the same, so that change alone did not do much. Training it for 30 epochs cleaned up most of the broken digits, so most of the improvement came from training longer.</p>
+  <p>I also trained the class model on Fashion MNIST. Every column is clearly its clothing type after 10 epochs, and at 30 epochs the shirts get printed patterns and the sandal straps are sharper.</p>
+</div>
+<div class="eq">unflatten &larr; t<sub>1</sub> &middot; unflatten + s<sub>1</sub>, &nbsp; up1 &larr; t<sub>2</sub> &middot; up1 + s<sub>2</sub></div>
+<div class="gallery one">
+<figure><img src="images/bw_original_10.png" alt="og, 10 epochs"><figcaption>og, 10 epochs</figcaption></figure>
+<figure><img src="images/bw_shift_10.png" alt="scale + shift, 10 epochs"><figcaption>scale + shift, 10 epochs</figcaption></figure>
+<figure><img src="images/bw_shift_30.png" alt="scale + shift, 30 epochs"><figcaption>scale + shift, 30 epochs</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/shift_10_loss.png" alt="loss, 10 epochs"><figcaption>loss, 10 epochs</figcaption></figure>
+<figure><img src="images/shift_30_loss.png" alt="loss, 30 epochs"><figcaption>loss, 30 epochs</figcaption></figure>
+</div>
+<h3 id="bcorrection">correction training</h3>
+<p class="cite">Based on <a href="https://sunovivid.github.io/correction-training/">Correction Training for Diffusion Models</a> (Ahn, Wang, Efros, Park, Belhe, 2026).</p>
+<div class="eq">x&#770; = x<sub>t</sub> + (1 &minus; t) u<sub>&theta;</sub>(x<sub>t</sub>, t), &nbsp; x&#770; &larr; C<sub>&phi;</sub>(x&#770;, t) &nbsp;(K times)<span class="note">L = &Vert;u<sub>&theta;</sub> &minus; (x<sub>1</sub> &minus; x<sub>0</sub>)&Vert;&sup2; + &Vert;C<sub>&phi;</sub>(sg(x&#770;), t) &minus; x<sub>1</sub>&Vert;&sup2;</span></div>
+<pre class="code"><code class="language-python">def correct_time_sample(unet, correct_model, K, num_ts=50, seed=0):
+    unet.eval()
+    correct_model.eval()
+    torch.manual_seed(seed)
+    x = torch.randn(40, 1, 28, 28, device=device)
+    for i in range(num_ts):
+        t = torch.full((40,), i / num_ts, device=device)
+        t_image = t.reshape(-1, 1, 1, 1)
+        u = unet(x, t)
+        outputs = x + (1 - t_image) * u
+        for k in range(K):
+            outputs = correct_model(outputs, t)
+        u = (outputs - x) / (1 - t_image)
+        x = x + (1 / num_ts) * u
+    return x</code></pre>
+<div class="gallery one">
+<figure><img src="images/correct_K0.png" alt="time only, K=0"><figcaption>time only, K=0</figcaption></figure>
+<figure><img src="images/correct_K1.png" alt="K=1"><figcaption>K=1</figcaption></figure>
+<figure><img src="images/correct_K2.png" alt="K=2"><figcaption>K=2</figcaption></figure>
+<figure><img src="images/correct_K4.png" alt="K=4"><figcaption>K=4</figcaption></figure>
+</div>
+<div class="gallery one">
+<figure><img src="images/class_correct_K0.png" alt="class, no cfg"><figcaption>class, no cfg</figcaption></figure>
+<figure><img src="images/class_correct_K2.png" alt="class, no cfg, K=2"><figcaption>class, no cfg, K=2</figcaption></figure>
+<figure><img src="images/class_correct_cfg.png" alt="class, cfg 5"><figcaption>class, cfg 5</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/correction_loss.png" alt="loss, time only"><figcaption>loss, time only</figcaption></figure>
+<figure><img src="images/class_correction_loss.png" alt="loss, class"><figcaption>loss, class</figcaption></figure>
+</div>
+<div class="writeup">
+  <p>I saw this paper on Twitter. It just came out from Professor Efros's group, and since it is about getting good samples without CFG, I wanted to try it on my own flow model. The idea is to train a second UNet, the corrector, that takes the model's guess of the clean digit and learns to fix it. When sampling, at every step I guess the clean digit, run the corrector on it K times, and then take the normal Euler step toward it.</p>
+  <p>At this small scale it did not change much. With K = 2 a couple of broken digits turn into real ones, but the strokes get a little blurrier, and on the class model CFG still looks cleaner. I tried a few different variations, but I think some aspect of this is a property of scale. It is somewhat competitive with CFG, but there are still areas where it does not match up. Unfortunately, due to time constraints, I couldn't try this on other datasets, but I'd be interested to see how it goes.</p>
+</div>
+<h3 id="bfashion">fashion mnist (extra)</h3>
+<div class="gallery one">
+<figure><img src="images/fashion_10.png" alt="fashion mnist, 10 epochs"><figcaption>fashion mnist, 10 epochs</figcaption></figure>
+<figure><img src="images/fashion_30.png" alt="fashion mnist, 30 epochs"><figcaption>fashion mnist, 30 epochs</figcaption></figure>
+</div>
+<div class="gallery two">
+<figure><img src="images/fashion_10_loss.png" alt="loss, 10 epochs"><figcaption>loss, 10 epochs</figcaption></figure>
+<figure><img src="images/fashion_30_loss.png" alt="loss, 30 epochs"><figcaption>loss, 30 epochs</figcaption></figure>
+</div>
+</section>
+
+<section id="learned">
+  <h2><span class="num">End</span>The most important thing I learned</h2>
+<div class="writeup">
+  <p>In a general sense, I understood how you take a large mass of images and train on some error function of how well you mimic each one. But it was always confusing to me why the model doesn't just learn the average of the entire dataset. I think to a certain extent it technically does, and then it's able to differentiate from there. I have tried to do some work in image generation before, and class conditioning was always very confusing to me. Implementing CFG helped a lot. The model learns both with and without the label, and CFG pushes the guess away from the average of every digit and toward the one I asked for. But trying to get similar results to CFG without using it, with the corrector, also taught me a lot about how these models internally represent things, and where their weaknesses lie. Part of what correction training showed me is that the blurry average is the weak spot. CFG and the corrector are both ways of pushing the guess away from it, and on MNIST, CFG just did it better.</p>
+</div>
+</section>
+
+
+</main>
+<div class="lightbox" id="lightbox"><img alt=""></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script>
+  // click any picture to see it full screen, click again to close
+  var box = document.getElementById("lightbox");
+  document.querySelectorAll(".gallery img").forEach(function (picture) {
+    picture.addEventListener("click", function () {
+      box.querySelector("img").src = picture.src;
+      box.classList.add("on");
+    });
+  });
+  box.addEventListener("click", function () { box.classList.remove("on"); });
+
+  // highlight the sidebar link for the part you are reading
+  var links = document.querySelectorAll(".side a");
+  function mark() {
+    var current = null;
+    links.forEach(function (link) {
+      var target = document.getElementById(link.getAttribute("href").slice(1));
+      if (target.getBoundingClientRect().top < 150) {
+        current = link;
+      }
+    });
+    links.forEach(function (link) { link.classList.remove("on"); });
+    if (current) {
+      current.classList.add("on");
+      current.scrollIntoView({ block: "nearest" });
+    }
+  }
+  window.addEventListener("scroll", mark);
+  mark();
+
+  // play the anagram transform once, click again to go back
+  document.querySelectorAll(".anim-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var figure = button.closest(".anim");
+      var flipped = figure.classList.toggle("flipped");
+      button.innerHTML = flipped ? "&#8634; back" : "&#9654; play";
+    });
+  });
+</script>
+</body>
+</html>
