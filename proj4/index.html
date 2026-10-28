@@ -39,6 +39,22 @@
   .code-details { margin: 10px 0 18px; }
   .code-details summary { cursor: pointer; font-family: var(--mono); font-size: 0.85rem; color: var(--ox); }
   .cmp { margin: 18px 0 28px; }
+  .viewer-print, .print-note { display: none; }
+  @media print {
+    :root { --paper: #ffffff; --paper-2: #f2f2f2; --ink: #111111; --ink-2: #555555; --rule: #cccccc; --ox: #9a5b12; --teal: #2f6b55; }
+    body { background: #ffffff; color: #111111; padding-left: 0 !important; }
+    .side, nav.toc, .lightbox, .viewer-buttons, .viewer-main, .viewer > figcaption,
+    .cmp-box, .cmp-buttons, .cmp-tabs, .cmp > figcaption, .code-details, #status { display: none !important; }
+    .print-note { display: block; border: 1px solid #999; padding: 10px 14px; margin: 0 0 20px; font-size: 0.85rem; }
+    .viewer-print { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .viewer-print figure { margin: 0; break-inside: avoid; }
+    .viewer-print img { width: 100%; height: auto; max-height: 4.2in; object-fit: contain; border: 1px solid #ccc; }
+    .viewer-print figcaption { font-family: var(--mono); font-size: 0.65rem; color: #555; margin-top: 3px; text-align: center; }
+    .gallery figure, table, .eq, .matrices { break-inside: avoid; }
+    h2, h3 { break-after: avoid; }
+    section { break-before: page; }
+    section:first-of-type { break-before: auto; }
+  }
   .cmp-box { position: relative; max-width: 900px; margin: 0 auto; cursor: ew-resize; user-select: none; touch-action: pan-y; border: 1px solid var(--rule); }
   .cmp-box img { display: block; width: 100%; height: auto; pointer-events: none; }
   .cmp-box .cmp-over { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); }
@@ -70,6 +86,9 @@
   <a href="#a1">A.1</a><a href="#a2">A.2</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#a5">B&amp;W</a>
 </nav>
 <main>
+<div class="print-note">This PDF is a print of <b>https://johnheibel.github.io/cs280/proj4/</b>. The live page is interactive: the
+tabbed image viewers, the drag-to-compare blending slider and the folded code blocks. In this PDF every tab of every
+viewer is printed out one after another, and the slider is shown as its three versions side by side.</div>
 <section id="a1">
   <h2><span class="num">A.1</span>Shooting the pictures</h2>
 <div class="writeup">
@@ -106,8 +125,15 @@
 <figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic1_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, 5 points&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic2_points.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, 5 points&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 2 and 3, 5 points&quot;}]}, {&quot;tab&quot;: &quot;atrium photos 1-2&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_12_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 1 and 2, for the 4-photo panorama&quot;}]}, {&quot;tab&quot;: &quot;atrium photos 3-4&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_34_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 3 and 4, for the 4-photo panorama&quot;}]}]">
   <div class="viewer-buttons tabs"></div>
   <div class="viewer-buttons modes"></div>
-  <img src="images/mosaic1_points.jpg" alt="Gateway, outside, 5 points">
+  <img class="viewer-main" src="images/mosaic1_points.jpg" alt="Gateway, outside, 5 points">
   <figcaption>Gateway, outside, 5 points</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1_points.jpg" alt="Gateway, outside, 5 points"><figcaption>Gateway, outside, 5 points</figcaption></figure>
+    <figure><img src="images/mosaic2_points.jpg" alt="Weill Hall, 5 points"><figcaption>Weill Hall, 5 points</figcaption></figure>
+    <figure><img src="images/mosaic3_points.jpg" alt="Gateway atrium, photos 2 and 3, 5 points"><figcaption>Gateway atrium, photos 2 and 3, 5 points</figcaption></figure>
+    <figure><img src="images/mosaic3_12_points.jpg" alt="Gateway atrium, photos 1 and 2, for the 4-photo panorama"><figcaption>Gateway atrium, photos 1 and 2, for the 4-photo panorama</figcaption></figure>
+    <figure><img src="images/mosaic3_34_points.jpg" alt="Gateway atrium, photos 3 and 4, for the 4-photo panorama"><figcaption>Gateway atrium, photos 3 and 4, for the 4-photo panorama</figcaption></figure>
+  </div>
 </figure>
 <h3>system of equations (Gateway, outside)</h3>
 <div class="matrices"><div><p>A</p>
@@ -180,8 +206,18 @@
 <figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic1.jpg&quot;, &quot;caption&quot;: &quot;Gateway building, outside&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic1_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway building, outside, source photos&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic2.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic2_sources.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall source photos&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic3_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium source photos&quot;}]}, {&quot;tab&quot;: &quot;atrium, 4 photos&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/atrium_panorama.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, all 4 photos&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/atrium_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium source photos&quot;}]}]">
   <div class="viewer-buttons tabs"></div>
   <div class="viewer-buttons modes"></div>
-  <img src="images/mosaic1.jpg" alt="Gateway building, outside">
+  <img class="viewer-main" src="images/mosaic1.jpg" alt="Gateway building, outside">
   <figcaption>Gateway building, outside</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1.jpg" alt="Gateway building, outside"><figcaption>Gateway building, outside</figcaption></figure>
+    <figure><img src="images/mosaic1_sources.jpg" alt="Gateway building, outside, source photos"><figcaption>Gateway building, outside, source photos</figcaption></figure>
+    <figure><img src="images/mosaic2.jpg" alt="Weill Hall"><figcaption>Weill Hall</figcaption></figure>
+    <figure><img src="images/mosaic2_sources.jpg" alt="Weill Hall source photos"><figcaption>Weill Hall source photos</figcaption></figure>
+    <figure><img src="images/mosaic3.jpg" alt="Gateway atrium"><figcaption>Gateway atrium</figcaption></figure>
+    <figure><img src="images/mosaic3_sources.jpg" alt="Gateway atrium source photos"><figcaption>Gateway atrium source photos</figcaption></figure>
+    <figure><img src="images/atrium_panorama.jpg" alt="Gateway atrium, all 4 photos"><figcaption>Gateway atrium, all 4 photos</figcaption></figure>
+    <figure><img src="images/atrium_sources.jpg" alt="Gateway atrium source photos"><figcaption>Gateway atrium source photos</figcaption></figure>
+  </div>
 </figure>
 <h3 id="a4-panorama">4-photo panorama</h3>
 <div class="writeup">
@@ -203,6 +239,11 @@
   </div>
   <div class="cmp-buttons"><button type="button" class="on" data-kind="overwrite">no blending</button><button type="button" data-kind="average">plain average</button></div>
   <figcaption>drag the line to compare</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic2_overwrite.jpg" alt="no blending"><figcaption>Weill Hall, no blending (image 2 pasted on top)</figcaption></figure>
+    <figure><img src="images/mosaic2_average.jpg" alt="plain average"><figcaption>Weill Hall, plain average of the overlap</figcaption></figure>
+    <figure><img src="images/mosaic2.jpg" alt="feathered"><figcaption>Weill Hall, feathered</figcaption></figure>
+  </div>
 </figure>
 </section>
 
@@ -283,8 +324,21 @@
 <figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic1_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic1.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic1_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic2_cyl.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic2.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic2_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic3_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic3_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;atrium, 4 photos&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/atrium_panorama_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 4 photos, cylinder, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/atrium_panorama.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 4 photos, planar&quot;}]}]">
   <div class="viewer-buttons tabs"></div>
   <div class="viewer-buttons modes"></div>
-  <img src="images/mosaic1_cyl.jpg" alt="Gateway, outside, cylinder, rotation + shift, f=1110">
+  <img class="viewer-main" src="images/mosaic1_cyl.jpg" alt="Gateway, outside, cylinder, rotation + shift, f=1110">
   <figcaption>Gateway, outside, cylinder, rotation + shift, f=1110</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1_cyl.jpg" alt="Gateway, outside, cylinder, rotation + shift, f=1110"><figcaption>Gateway, outside, cylinder, rotation + shift, f=1110</figcaption></figure>
+    <figure><img src="images/mosaic1.jpg" alt="Gateway, outside, planar"><figcaption>Gateway, outside, planar</figcaption></figure>
+    <figure><img src="images/mosaic1_cyl_shift.jpg" alt="Gateway, outside, first try, shift only, f=1200"><figcaption>Gateway, outside, first try, shift only, f=1200</figcaption></figure>
+    <figure><img src="images/mosaic2_cyl.jpg" alt="Weill Hall, cylinder, rotation + shift, f=1110"><figcaption>Weill Hall, cylinder, rotation + shift, f=1110</figcaption></figure>
+    <figure><img src="images/mosaic2.jpg" alt="Weill Hall, planar"><figcaption>Weill Hall, planar</figcaption></figure>
+    <figure><img src="images/mosaic2_cyl_shift.jpg" alt="Weill Hall, first try, shift only, f=1200"><figcaption>Weill Hall, first try, shift only, f=1200</figcaption></figure>
+    <figure><img src="images/mosaic3_cyl.jpg" alt="Gateway atrium, cylinder, rotation + shift, f=1110"><figcaption>Gateway atrium, cylinder, rotation + shift, f=1110</figcaption></figure>
+    <figure><img src="images/mosaic3.jpg" alt="Gateway atrium, planar"><figcaption>Gateway atrium, planar</figcaption></figure>
+    <figure><img src="images/mosaic3_cyl_shift.jpg" alt="Gateway atrium, first try, shift only, f=1200"><figcaption>Gateway atrium, first try, shift only, f=1200</figcaption></figure>
+    <figure><img src="images/atrium_panorama_cyl.jpg" alt="Gateway atrium, 4 photos, cylinder, f=1110"><figcaption>Gateway atrium, 4 photos, cylinder, f=1110</figcaption></figure>
+    <figure><img src="images/atrium_panorama.jpg" alt="Gateway atrium, 4 photos, planar"><figcaption>Gateway atrium, 4 photos, planar</figcaption></figure>
+  </div>
 </figure>
 <h3 id="a5-panorama">4-photo atrium panorama on a cylinder</h3>
 <div class="writeup">
