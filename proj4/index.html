@@ -41,6 +41,11 @@
   .code-details summary { cursor: pointer; font-family: var(--mono); font-size: 0.85rem; color: var(--ox); }
   .cmp { margin: 18px 0 28px; }
   .viewer-print, .print-note { display: none; }
+  @page {
+    margin: 0.55in 0.5in 0.6in;
+    @bottom-left { content: "https://johnheibel.github.io/cs280/proj4/"; font-family: ui-monospace, Menlo, monospace; font-size: 8pt; color: #666; }
+    @bottom-right { content: counter(page) " / " counter(pages); font-family: ui-monospace, Menlo, monospace; font-size: 8pt; color: #666; }
+  }
   @media print {
     :root { --paper: #ffffff; --paper-2: #f2f2f2; --ink: #111111; --ink-2: #555555; --rule: #cccccc; --ox: #9a5b12; --teal: #2f6b55; }
     body { background: #ffffff; color: #111111; padding-left: 0 !important; }
