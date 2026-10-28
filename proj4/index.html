@@ -44,6 +44,8 @@
   @media print {
     :root { --paper: #ffffff; --paper-2: #f2f2f2; --ink: #111111; --ink-2: #555555; --rule: #cccccc; --ox: #9a5b12; --teal: #2f6b55; }
     body { background: #ffffff; color: #111111; padding-left: 0 !important; }
+    body::before, body::after, header.site { background: none !important; background-image: none !important; }
+    body::before, body::after { display: none !important; }
     .side, nav.toc, .lightbox, .viewer-buttons, .viewer-main, .viewer > figcaption,
     .cmp-box, .cmp-buttons, .cmp-tabs, .cmp > figcaption, .code-details, #status { display: none !important; }
     .print-note { display: block; border: 1px solid #999; padding: 10px 14px; margin: 0 0 20px; font-size: 0.85rem; }
