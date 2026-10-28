@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Warping and Mosaicing — CS280A Project 4A</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .gallery .todo { min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+  .gallery.three { max-width: 100%; }
+  .eq { font-family: var(--serif); font-size: 1.15rem; text-align: center; margin: 20px 0 24px; line-height: 1.6; }
+  .eq .note { display: block; font-family: inherit; font-size: 0.85rem; opacity: 0.7; margin-top: 2px; }
+  .matrix { display: block; }
+  .side { display: none; }
+  @media (min-width: 1000px) {
+    body { padding-left: 220px; }
+    .side { display: block; position: fixed; top: 0; left: 0; bottom: 0; width: 220px; overflow-y: auto; padding: 24px 14px 40px; border-right: 1px solid var(--rule); background: var(--paper); font-size: 0.82rem; }
+  }
+  .side p { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox); margin: 18px 0 6px 10px; }
+  .side a { display: block; color: var(--ink-2); text-decoration: none; padding: 3px 8px; border-left: 2px solid transparent; line-height: 1.35; }
+  .side a span { font-family: var(--mono); font-size: 0.72rem; color: var(--ox); margin-right: 6px; }
+  .side a:hover, .side a.on { color: var(--ink); border-left-color: var(--ox); }
+  section, h3[id] { scroll-margin-top: 16px; }
+  .row-title { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); margin: 18px 0 -6px; }
+  .viewer { margin: 14px 0 26px; }
+  .viewer img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; border: 1px solid var(--rule); cursor: zoom-in; }
+  .viewer figcaption { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-2); margin-top: 6px; text-align: center; }
+  .viewer-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0 0 10px; }
+  .viewer-buttons:empty { display: none; }
+  .viewer-buttons button { padding: 5px 14px; font: inherit; font-size: 0.85rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; opacity: 0.6; }
+  .viewer-buttons button.on { opacity: 1; font-weight: 600; }
+  .viewer-buttons.modes button { border-style: dashed; }
+  .matrices { display: flex; flex-wrap: wrap; gap: 0 28px; align-items: flex-start; }
+  .matrices p { margin: 6px 0 0; font-family: var(--mono); font-size: 0.75rem; color: var(--ink-2); }
+  .code-details { margin: 10px 0 18px; }
+  .code-details summary { cursor: pointer; font-family: var(--mono); font-size: 0.85rem; color: var(--ox); }
+  .cmp { margin: 18px 0 28px; }
+  .cmp-box { position: relative; max-width: 900px; margin: 0 auto; cursor: ew-resize; user-select: none; touch-action: pan-y; border: 1px solid var(--rule); }
+  .cmp-box img { display: block; width: 100%; height: auto; pointer-events: none; }
+  .cmp-box .cmp-over { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); }
+  .cmp-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.6); }
+  .cmp-label { position: absolute; top: 8px; font-family: var(--mono); font-size: 0.72rem; color: #fff; background: rgba(0,0,0,.55); padding: 2px 8px; border-radius: 3px; }
+  .cmp-label.left { left: 8px; }
+  .cmp-label.right { right: 8px; }
+  .cmp-buttons { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+  .cmp-buttons button { padding: 5px 14px; font: inherit; font-size: 0.85rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; opacity: 0.6; }
+  .cmp-buttons button.on { opacity: 1; font-weight: 600; }
+  .cmp figcaption { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-2); margin-top: 6px; text-align: center; }
+</style>
+</head>
+<body>
+<nav class="side">
+<p>project 4a</p>
+<a href="#a1"><span>A.1</span>Shooting the pictures</a>
+<a href="#a2"><span>A.2</span>Recovering homographies</a>
+<a href="#a3"><span>A.3</span>Warping the images</a>
+<a href="#a4"><span>A.4</span>Blending into a mosaic</a>
+<a href="#a5"><span>B&amp;W</span>Bells &amp; whistles: cylindrical mapping (CS280A)</a>
+</nav>
+<header class="site">
+  <p class="kicker">CS280A · Project 4A · Fall 2026</p>
+  <h1>Project 4A: Image Warping and Mosaicing</h1>
+  <p class="sub">John Heibel</p>
+</header>
+<nav class="toc">
+  <a href="#a1">A.1</a><a href="#a2">A.2</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#a5">B&amp;W</a>
+</nav>
+<main>
+<section id="a1">
+  <h2><span class="num">A.1</span>Shooting the pictures</h2>
+<div class="writeup">
+  <p>All of these were shot on an iPhone 17. For each mosaic, I tried to stand in one spot and only rotate the phone, so the center of projection stays put. The first set is the outside of the Gateway building from the lawn out front. The second set is Weill Hall from across the roundabout. And the third is from inside Gateway, looking down over the railing.</p>
+</div>
+<p class="row-title">Gateway building, outside</p>
+<div class="gallery four">
+<figure><img src="images/mosaic1_1.jpg" alt="photo 1"><figcaption>photo 1</figcaption></figure>
+<figure><img src="images/mosaic1_2.jpg" alt="photo 2"><figcaption>photo 2</figcaption></figure>
+</div>
+<p class="row-title">Weill Hall</p>
+<div class="gallery four">
+<figure><img src="images/mosaic2_1.jpg" alt="photo 1"><figcaption>photo 1</figcaption></figure>
+<figure><img src="images/mosaic2_2.jpg" alt="photo 2"><figcaption>photo 2</figcaption></figure>
+</div>
+<p class="row-title">Gateway building, atrium (4 photos)</p>
+<div class="gallery four">
+<figure><img src="images/mosaic3_1.jpg" alt="photo 1"><figcaption>photo 1</figcaption></figure>
+<figure><img src="images/mosaic3_2.jpg" alt="photo 2"><figcaption>photo 2</figcaption></figure>
+<figure><img src="images/mosaic3_3.jpg" alt="photo 3"><figcaption>photo 3</figcaption></figure>
+<figure><img src="images/mosaic3_4.jpg" alt="photo 4"><figcaption>photo 4</figcaption></figure>
+</div>
+</section>
+
+<section id="a2">
+  <h2><span class="num">A.2</span>Recovering homographies</h2>
+<div class="writeup">
+  <p>Each point pair gives you two equations, one for x′ and one for y′, after you multiply out the bottom row of H. For these images, I clicked 5 points by hand using the correspondence tool made by a past student, on recognizable spots in both images. Since this is an overdetermined system (10 equations for 8 unknowns), I solve it with least squares and put the 1 back in as the bottom right entry of H.</p>
+</div>
+<div class="eq">p&prime; = H p, &nbsp; H = [ a b c ; d e f ; g h 1 ]</div>
+<div class="eq">x&prime; = (a x + b y + c) / (g x + h y + 1), &nbsp; y&prime; = (d x + e y + f) / (g x + h y + 1)</div>
+<div class="eq">[ x y 1 0 0 0 &minus;x x&prime; &minus;y x&prime; ] h = x&prime;<br>[ 0 0 0 x y 1 &minus;x y&prime; &minus;y y&prime; ] h = y&prime;<span class="note">two rows per point; 5 points gives 10 equations for 8 unknowns, solved with least squares</span></div>
+<h3>correspondences</h3>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic1_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, 5 points&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic2_points.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, 5 points&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 2 and 3, 5 points&quot;}]}, {&quot;tab&quot;: &quot;atrium photos 1-2&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_12_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 1 and 2, for the 4-photo panorama&quot;}]}, {&quot;tab&quot;: &quot;atrium photos 3-4&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_34_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 3 and 4, for the 4-photo panorama&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img src="images/mosaic1_points.jpg" alt="Gateway, outside, 5 points">
+  <figcaption>Gateway, outside, 5 points</figcaption>
+</figure>
+<h3>system of equations (Gateway, outside)</h3>
+<div class="matrices"><div><p>A</p>
+<div class="matrix">[       571        370          1          0          0          0     -29121     -18870 ]
+[         0          0          0        571        370          1    -173584    -112480 ]
+[      1177        288          1          0          0          0    -768581    -188064 ]
+[         0          0          0       1177        288          1    -403711     -98784 ]
+[       887        407          1          0          0          0    -353026    -161986 ]
+[         0          0          0        887        407          1    -359235    -164835 ]
+[      1146       1112          1          0          0          0    -699060    -678320 ]
+[         0          0          0       1146       1112          1   -1235388   -1198736 ]
+[       635       1073          1          0          0          0     -66675    -112665 ]
+[         0          0          0        635       1073          1    -690245   -1166351 ]</div>
+</div><div><p>b</p>
+<div class="matrix">[    51 ]
+[   304 ]
+[   653 ]
+[   343 ]
+[   398 ]
+[   405 ]
+[   610 ]
+[  1078 ]
+[   105 ]
+[  1087 ]</div>
+</div><div><p>recovered H</p>
+<div class="matrix">[     1.682136     -0.048141   -875.184940 ]
+[     0.481145      1.465137   -415.199972 ]
+[     0.000574     -0.000018      1.000000 ]</div>
+</div></div>
+</section>
+
+<section id="a3">
+  <h2><span class="num">A.3</span>Warping the images</h2>
+<div class="writeup">
+  <p>We're using inverse warping for this assignment. So first, we apply our homography to the four corners of the image to figure out the size of the output. Then for every output pixel, you use the inverse of your homography to figure out where it came from in the original, which lets you avoid holes in your output image. For nearest neighbor interpolation, we just take the closest pixel, and bilinear takes the weighted average of the four closest pixels, which leads to a pretty sizable difference in images between the two.</p>
+  <p>For rectification, all I did was click the four corners of the bulletin board and MLK sign, then map them to a rectangle. It's fairly straightforward, and our warping made it look like you're standing right in front of them pretty well. The interpolation still mattered for readability, though.</p>
+  <p>When you zoom out, both bilinear interpolation and nearest neighbor interpolation look about the same. Once you zoom in on different parts of these images, nearest neighbor gets very blocky and jagged, while bilinear is a lot smoother. Bilinear is noticeably slower on our images, since it has to read 4 pixels for every output pixel instead of 1. Both methods get slower with the size of the output, since we have to go through the loop once for every output pixel. Bilinear is definitely a vast improvement quality-wise.</p>
+</div>
+<div class="eq">for every output pixel p&prime;: &nbsp; p = H<sup>&minus;1</sup> p&prime;, &nbsp; then sample the image at p<span class="note">bounding box from the four corners pushed through H; pixels that land outside the image stay empty (mask)</span></div>
+<div class="eq">I(x, y) = (1&minus;dx)(1&minus;dy) I<sub>00</sub> + dx(1&minus;dy) I<sub>10</sub> + (1&minus;dx) dy I<sub>01</sub> + dx dy I<sub>11</sub><span class="note">bilinear; nearest neighbor just rounds x and y</span></div>
+<h3>rect1</h3>
+<div class="gallery three">
+<figure><img src="images/rect1_corners.jpg" alt="og, clicked corners"><figcaption>og, clicked corners</figcaption></figure>
+<figure><img src="images/rect1_nn.jpg" alt="nearest neighbor"><figcaption>nearest neighbor</figcaption></figure>
+<figure><img src="images/rect1_bil.jpg" alt="bilinear"><figcaption>bilinear</figcaption></figure>
+</div>
+<h3>rect2</h3>
+<div class="gallery three">
+<figure><img src="images/rect2_corners.jpg" alt="og, clicked corners"><figcaption>og, clicked corners</figcaption></figure>
+<figure><img src="images/rect2_nn.jpg" alt="nearest neighbor"><figcaption>nearest neighbor</figcaption></figure>
+<figure><img src="images/rect2_bil.jpg" alt="bilinear"><figcaption>bilinear</figcaption></figure>
+</div>
+<h3>zoomed in</h3>
+<div class="gallery two">
+<figure><img src="images/rect2_zoom_nn.jpg" alt="nearest neighbor, 4x"><figcaption>nearest neighbor, 4x</figcaption></figure>
+<figure><img src="images/rect2_zoom_bil.jpg" alt="bilinear, 4x"><figcaption>bilinear, 4x</figcaption></figure>
+</div>
+<h3>speed</h3>
+<table class="offsets narrow"><thead><tr><th>image</th><th>output (px)</th><th>megapixels</th><th>nearest (s)</th><th>bilinear (s)</th><th>bilinear / nearest</th></tr></thead><tbody><tr><td>rect1</td><td>1410 &times; 2080</td><td>2.9</td><td>6.6</td><td>13.4</td><td>2.0&times;</td></tr><tr><td>rect2</td><td>1897 &times; 2651</td><td>5.0</td><td>10.9</td><td>22.6</td><td>2.1&times;</td></tr></tbody></table>
+</section>
+
+<section id="a4">
+  <h2><span class="num">A.4</span>Blending into a mosaic</h2>
+<div class="writeup">
+  <p>Here we apply our inverse warp to create mosaics. Given two images, we keep one static and warp the other one into its frame, using bilinear interpolation. Then we can blend the images together, where each image gets a weight at every pixel equal to the distance to the nearest edge of that image. So a pixel in the middle of an image is highly valued, and a pixel at the edge is barely valued at all. The mosaic is then the weighted average of the two, which avoids any hard seams.</p>
+  <p>I mostly chose buildings for my mosaics, and used two-photo mosaics for the outside of Gateway and Weill Hall. I also took a four-photo mosaic of the inside of Gateway. The first two came out pretty clean, it's hard to see much ghosting. But the inside of Gateway has quite a few high frequency features, like the bars on the walls and the railing right in front of me, and I had some small movements of my phone between rotations that caused some parallax.</p>
+</div>
+<div class="eq">mosaic = (w<sub>1</sub> I<sub>1</sub> + w<sub>2</sub> I<sub>2</sub>) / (w<sub>1</sub> + w<sub>2</sub>)<span class="note">w = distance to the nearest edge of that image (0 outside it)</span></div>
+<h3>mosaics</h3>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic1.jpg&quot;, &quot;caption&quot;: &quot;Gateway building, outside&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic1_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway building, outside, source photos&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic2.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic2_sources.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall source photos&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic3_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium source photos&quot;}]}, {&quot;tab&quot;: &quot;atrium, 4 photos&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/atrium_panorama.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, all 4 photos&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/atrium_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium source photos&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img src="images/mosaic1.jpg" alt="Gateway building, outside">
+  <figcaption>Gateway building, outside</figcaption>
+</figure>
+<h3 id="a4-panorama">4-photo panorama</h3>
+<div class="writeup">
+  <p>For the interior of Gateway, I also took 4 photos, to show that we can stitch together more than 2. I took points between each pair of neighbors and left photo 3 as the reference, and then we can chain together homographies to get everything into its frame. Photo 2 uses the homography from 2 to 3. Photo 1 uses the homography from 1 to 2 and then 2 to 3, so H 2→3 times H 1→2. And photo 4 uses the inverse of the homography from 3 to 4. Then we just warp them all, put them on one canvas, and feather them using the same technique as before.</p>
+  <p>Picking points between these was honestly quite difficult. It's hard to keep track of the features you're choosing across multiple images, and you try to only have overlap between one image and its neighbors, but sometimes that's hard. I tried to mostly pick points that were far away in the scene to get more stable alignments, because the parallax from my slight motions made near objects shift more. There definitely is still some ghosting and doubled objects near me, but the farther out objects are still pretty good.</p>
+</div>
+<div class="eq">H<sub>1&rarr;3</sub> = H<sub>2&rarr;3</sub> H<sub>1&rarr;2</sub>, &nbsp; H<sub>4&rarr;3</sub> = H<sub>3&rarr;4</sub><sup>&minus;1</sup><span class="note">photo 3 is the reference; photo 2 uses H<sub>2&rarr;3</sub> and photo 3 uses the identity</span></div>
+<h3 id="a4-blending">why feathering</h3>
+<div class="writeup">
+  <p>These images look quite bad without feathering. In the Weill Hall example, the sun made the two images expose differently, so with no blending or even a plain average, you just get a hard seam, while feathering smooths it into one gradient.</p>
+</div>
+<figure class="cmp" data-name="mosaic2" data-kind="overwrite">
+  <div class="viewer-buttons cmp-tabs"><button type="button" data-name="mosaic2" class="on">Weill Hall</button><button type="button" data-name="mosaic1">Gateway, outside</button><button type="button" data-name="mosaic3">Gateway atrium</button></div>
+  <div class="cmp-box">
+    <img class="cmp-under" src="images/mosaic2.jpg" alt="feathered">
+    <img class="cmp-over" src="images/mosaic2_overwrite.jpg" alt="not blended">
+    <div class="cmp-line"></div>
+    <span class="cmp-label left">no blending</span><span class="cmp-label right">feathered</span>
+  </div>
+  <div class="cmp-buttons"><button type="button" class="on" data-kind="overwrite">no blending</button><button type="button" data-kind="average">plain average</button></div>
+  <figcaption>drag the line to compare</figcaption>
+</figure>
+</section>
+
+<section id="a5">
+  <h2><span class="num">B&amp;W</span>Bells &amp; whistles: cylindrical mapping (CS280A)</h2>
+<div class="writeup">
+  <p>For the cylindrical version I put each photo on a cylinder with radius f before stitching. It's inverse sampling again, for every pixel in the final mosaic I work out its angle on the cylinder, θ = (x − cx) / f, and look up where that lands in the original flat photo. So every pixel gets sampled once, straight from the original, and I never warp something that's already been warped. I move the clicked points onto the cylinder too, and then line the two photos up with a small rotation plus a shift, and blend with the same distance weights as before.</p>
+  <p>For f I used 1110, which is the real focal length of the phone. I shot everything on an iPhone 17 Pro Max at 1x, which is a 24 mm equivalent lens, and at 1200 x 1600 that works out to about 24 / 43.3 x 2000 ≈ 1110 px. Compared to the planar mosaics, I think the cylindrical ones look a lot more natural, the warped side doesn't get stretched out. The tradeoff is straight lines like the roofline come out curved.</p>
+</div>
+<div class="eq">&theta; = (x &minus; c<sub>x</sub>) / f, &nbsp; x<sub>src</sub> = f tan &theta; + c<sub>x</sub>, &nbsp; y<sub>src</sub> = (y &minus; c<sub>y</sub>) / cos &theta; + c<sub>y</sub><span class="note">f = 1110, the iPhone 1x lens (24 mm equivalent) at 1200 &times; 1600</span></div>
+<div class="eq">p<sub>2</sub> &asymp; R(&alpha;) p<sub>1</sub> + t, &nbsp; &alpha; = atan2( &Sigma; (a<sub>x</sub> b<sub>y</sub> &minus; a<sub>y</sub> b<sub>x</sub>), &Sigma; (a<sub>x</sub> b<sub>x</sub> + a<sub>y</sub> b<sub>y</sub>) )<span class="note">a, b = the cylinder points of each photo minus their mean; a pure pan would have &alpha; = 0</span></div>
+<details class="code-details"><summary>show the code</summary>
+<pre class="code"><code class="language-python">def cylinderSource(x, y, width, height, focal_length):
+    cx, cy = (width - 1) / 2, (height - 1) / 2
+    theta = (x - cx) / focal_length
+    source_x = focal_length * np.tan(theta) + cx
+    source_y = (y - cy) / np.cos(theta) + cy
+    return source_x, source_y</code></pre>
+<pre class="code"><code class="language-python">def fitRotationShift(points1, points2):
+    center1 = points1.mean(axis=0)
+    center2 = points2.mean(axis=0)
+    a = points1 - center1
+    b = points2 - center2
+
+    angle = np.arctan2(np.sum(a[:, 0] * b[:, 1] - a[:, 1] * b[:, 0]), np.sum(a[:, 0] * b[:, 0] + a[:, 1] * b[:, 1]))
+    rotation = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+    shift = center2 - rotation @ center1
+
+    return np.array([[rotation[0, 0], rotation[0, 1], shift[0]],
+                     [rotation[1, 0], rotation[1, 1], shift[1]],
+                     [0, 0, 1]])</code></pre>
+<pre class="code"><code class="language-python">def cylindricalMosaic(images, transforms, focal_length):
+    height, width = images[0].shape[:2]
+
+    inverses = []
+    for i in range(len(images)):
+        inverses.append(np.linalg.inv(transforms[i]))
+
+    x_min, y_min, x_max, y_max = 0, 0, 0, 0
+    for i in range(len(images)):
+        for corner in [(0, 0), (width - 1, 0), (0, height - 1), (width - 1, height - 1)]:
+            moved = transforms[i] @ np.array([corner[0], corner[1], 1])
+            x_min = min(x_min, int(np.floor(moved[0])))
+            y_min = min(y_min, int(np.floor(moved[1])))
+            x_max = max(x_max, int(np.ceil(moved[0])))
+            y_max = max(y_max, int(np.ceil(moved[1])))
+
+    out_height = y_max - y_min + 1
+    out_width = x_max - x_min + 1
+    canvases = []
+    masks = []
+    for i in range(len(images)):
+        canvases.append(np.zeros((out_height, out_width, 3)))
+        masks.append(np.zeros((out_height, out_width), dtype=bool))
+
+    for y in range(out_height):
+        for x in range(out_width):
+            for i in range(len(images)):
+                cyl_x, cyl_y, _ = inverses[i] @ np.array([x + x_min, y + y_min, 1])
+                source_x, source_y = cylinderSource(cyl_x, cyl_y, width, height, focal_length)
+                if 0 &lt;= source_x &lt;= width - 1 and 0 &lt;= source_y &lt;= height - 1:
+                    canvases[i][y, x] = bilinear(images[i], source_x, source_y)
+                    masks[i][y, x] = True
+
+    mosaic = np.zeros((out_height, out_width, 3))
+    total = np.zeros((out_height, out_width))
+    for i in range(len(images)):
+        weight = distance_transform_edt(np.pad(masks[i], 1))[1:-1, 1:-1]
+        mosaic += canvases[i] * weight[..., None]
+        total += weight
+
+    total[total == 0] = 1
+    mosaic = mosaic / total[..., None]
+
+    return mosaic.astype(np.uint8)</code></pre>
+</details>
+<h3>planar vs cylinder</h3>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic1_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic1.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic1_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic2_cyl.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic2.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic2_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic3_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic3_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;atrium, 4 photos&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/atrium_panorama_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 4 photos, cylinder, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/atrium_panorama.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 4 photos, planar&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img src="images/mosaic1_cyl.jpg" alt="Gateway, outside, cylinder, rotation + shift, f=1110">
+  <figcaption>Gateway, outside, cylinder, rotation + shift, f=1110</figcaption>
+</figure>
+<h3 id="a5-panorama">4-photo atrium panorama on a cylinder</h3>
+<div class="writeup">
+  <p>This is where the cylinder actually pays off. The planar Gateway atrium panorama has that bow tie shape, because on a plane the outer photos get stretched more the farther they are from the reference. On the cylinder, position is just angle, so every photo stays about the same size. I chained the rotation + shift fits the same way as the homographies, photo 1 goes through photo 2 to get to photo 3, and photo 4 uses the inverse, and then every pixel in the panorama gets sampled once straight from the original photos. It came out a lot more compact, 2191 x 1677 instead of 3146 x 2792, and I think it looks a lot more like what you actually see standing there.</p>
+</div>
+<h3 id="a5-roll">first try: shift only</h3>
+<div class="writeup">
+  <p>My first version actually looked worse than the planar mosaics, there was a lot more ghosting. The idea was that if you only rotate the camera, on the cylinder the two photos just differ by a shift, so I took the median shift of the points and that was it. The problem is that assumes a perfect level pan, and I'm a human holding a phone. Between shots the phone also rolled a little, 1.4 to 2.5 degrees, and a shift can't undo a rotation. So things lined up in the middle of the overlap and drifted apart toward the top and bottom. The homography in the planar version has 8 numbers, so it just absorbed the roll, which is why the planar ones looked better.</p>
+  <p>The fix was to fit a rotation plus a shift from the same points, which is a small least squares problem, and I also switched f from 1200 to the real 1110. The table has the average error at the clicked points both ways. You can flip between them with the first try button in the viewer above. You can see it best on Weill Hall, the first version has a ghost copy of the roofline floating above the building, and in the Gateway atrium the center column is doubled. With the rotation they're both gone. There are still a few faint doubled bars on the close railing in the atrium, but that's parallax, not roll.</p>
+</div>
+<table class="offsets narrow"><thead><tr><th>mosaic</th><th>roll between shots</th><th>shift only, f=1200 (px)</th><th>rotation + shift, f=1110 (px)</th></tr></thead><tbody><tr><td>Gateway, outside</td><td>1.4&deg;</td><td>13.1</td><td>1.7</td></tr><tr><td>Weill Hall</td><td>2.5&deg;</td><td>14.0</td><td>6.0</td></tr><tr><td>Gateway atrium</td><td>-1.8&deg;</td><td>14.6</td><td>1.5</td></tr></tbody></table>
+</section>
+
+
+</main>
+<div class="lightbox" id="lightbox"><img alt=""></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<script>
+  // click any picture to see it full screen, click again to close
+  var box = document.getElementById("lightbox");
+  document.querySelectorAll(".gallery img").forEach(function (picture) {
+    picture.addEventListener("click", function () {
+      box.querySelector("img").src = picture.src;
+      box.classList.add("on");
+    });
+  });
+  box.addEventListener("click", function () { box.classList.remove("on"); });
+
+  // highlight the sidebar link for the part you are reading
+  var links = document.querySelectorAll(".side a");
+  function mark() {
+    var current = null;
+    links.forEach(function (link) {
+      var target = document.getElementById(link.getAttribute("href").slice(1));
+      if (target.getBoundingClientRect().top < 150) {
+        current = link;
+      }
+    });
+    links.forEach(function (link) { link.classList.remove("on"); });
+    if (current) {
+      current.classList.add("on");
+      current.scrollIntoView({ block: "nearest" });
+    }
+  }
+  window.addEventListener("scroll", mark);
+  mark();
+
+  // viewers: tab buttons pick the mosaic, mode buttons pick the version
+  document.querySelectorAll(".viewer").forEach(function (figure) {
+    var tabs = JSON.parse(figure.dataset.tabs);
+    var tabRow = figure.querySelector(".tabs");
+    var modeRow = figure.querySelector(".modes");
+    var picture = figure.querySelector("img");
+    var caption = figure.querySelector("figcaption");
+    var current = { tab: 0, mode: 0 };
+    function show() {
+      var item = tabs[current.tab].modes[current.mode];
+      picture.src = item.src;
+      picture.alt = item.caption;
+      caption.textContent = item.caption;
+      tabRow.querySelectorAll("button").forEach(function (b, i) { b.classList.toggle("on", i === current.tab); });
+      modeRow.innerHTML = "";
+      if (tabs[current.tab].modes.length > 1) {
+        tabs[current.tab].modes.forEach(function (m, i) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.textContent = m.mode;
+          if (i === current.mode) { b.classList.add("on"); }
+          b.addEventListener("click", function () { current.mode = i; show(); });
+          modeRow.appendChild(b);
+        });
+      }
+    }
+    if (tabs.length > 1) {
+      tabs.forEach(function (t, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = t.tab;
+        b.addEventListener("click", function () {
+          var keep = tabs[current.tab].modes[current.mode].mode;
+          current.tab = i;
+          current.mode = 0;
+          tabs[i].modes.forEach(function (m, j) { if (m.mode === keep) { current.mode = j; } });
+          show();
+        });
+        tabRow.appendChild(b);
+      });
+    }
+    picture.addEventListener("click", function () {
+      box.querySelector("img").src = picture.src;
+      box.classList.add("on");
+    });
+    show();
+  });
+
+  // blending comparison: drag the line, buttons pick what is on the left
+  document.querySelectorAll(".cmp").forEach(function (figure) {
+    var boxEl = figure.querySelector(".cmp-box");
+    var over = figure.querySelector(".cmp-over");
+    var line = figure.querySelector(".cmp-line");
+    var label = figure.querySelector(".cmp-label.left");
+    var dragging = false;
+    function move(event) {
+      var rect = boxEl.getBoundingClientRect();
+      var percent = Math.max(0, Math.min(100, (event.clientX - rect.left) / rect.width * 100));
+      over.style.clipPath = "inset(0 " + (100 - percent) + "% 0 0)";
+      line.style.left = percent + "%";
+    }
+    boxEl.addEventListener("pointerdown", function (event) { dragging = true; move(event); });
+    window.addEventListener("pointermove", function (event) { if (dragging) { move(event); } });
+    window.addEventListener("pointerup", function () { dragging = false; });
+    var under = figure.querySelector(".cmp-under");
+    figure.querySelectorAll(".cmp-buttons button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        figure.querySelectorAll(".cmp-buttons button").forEach(function (other) { other.classList.remove("on"); });
+        button.classList.add("on");
+        figure.dataset.kind = button.dataset.kind;
+        over.src = "images/" + figure.dataset.name + "_" + figure.dataset.kind + ".jpg";
+        label.textContent = button.textContent;
+      });
+    });
+    figure.querySelectorAll(".cmp-tabs button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        figure.querySelectorAll(".cmp-tabs button").forEach(function (other) { other.classList.remove("on"); });
+        button.classList.add("on");
+        figure.dataset.name = button.dataset.name;
+        under.src = "images/" + figure.dataset.name + ".jpg";
+        over.src = "images/" + figure.dataset.name + "_" + figure.dataset.kind + ".jpg";
+      });
+    });
+  });
+</script>
+</body>
+</html>
