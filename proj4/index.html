@@ -40,12 +40,7 @@
   .code-details { margin: 10px 0 18px; }
   .code-details summary { cursor: pointer; font-family: var(--mono); font-size: 0.85rem; color: var(--ox); }
   .cmp { margin: 18px 0 28px; }
-  .viewer-print, .print-note { display: none; }
-  @page {
-    margin: 0.55in 0.5in 0.6in;
-    @bottom-left { content: "https://johnheibel.github.io/cs280/proj4/"; font-family: ui-monospace, Menlo, monospace; font-size: 8pt; color: #666; }
-    @bottom-right { content: counter(page) " / " counter(pages); font-family: ui-monospace, Menlo, monospace; font-size: 8pt; color: #666; }
-  }
+  .viewer-print { display: none; }
   @media print {
     :root { --paper: #ffffff; --paper-2: #f2f2f2; --ink: #111111; --ink-2: #555555; --rule: #cccccc; --ox: #9a5b12; --teal: #2f6b55; }
     body { background: #ffffff; color: #111111; padding-left: 0 !important; }
@@ -53,7 +48,6 @@
     body::before, body::after { display: none !important; }
     .side, nav.toc, .lightbox, .viewer-buttons, .viewer-main, .viewer > figcaption,
     .cmp-box, .cmp-buttons, .cmp-tabs, .cmp > figcaption, .code-details, #status { display: none !important; }
-    .print-note { display: block; border: 1px solid #999; padding: 10px 14px; margin: 0 0 20px; font-size: 0.85rem; }
     .viewer-print { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .viewer-print figure { margin: 0; break-inside: avoid; }
     .viewer-print img { width: 100%; height: auto; max-height: 4.2in; object-fit: contain; border: 1px solid #ccc; }
@@ -98,9 +92,6 @@
   <a href="#a1">A.1</a><a href="#a2">A.2</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#a5">B&amp;W</a>
 </nav>
 <main>
-<div class="print-note">This PDF is a print of <b>https://johnheibel.github.io/cs280/proj4/</b>. The live page is interactive: the
-tabbed image viewers, the drag-to-compare blending slider and the folded code blocks. In this PDF every tab of every
-viewer is printed out one after another, and the slider is shown as its three versions side by side.</div>
 <section id="a1">
   <h2><span class="num">A.1</span>Shooting the Pictures</h2>
 <div class="writeup">
