@@ -25,6 +25,7 @@
   .side a span { font-family: var(--mono); font-size: 0.72rem; color: var(--ox); margin-right: 6px; }
   .side a:hover, .side a.on { color: var(--ink); border-left-color: var(--ox); }
   section, h3[id] { scroll-margin-top: 16px; }
+  main h3 { font-weight: 600; font-size: 1.3rem; }
   .row-title { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); margin: 18px 0 -6px; }
   .viewer { margin: 14px 0 26px; }
   .viewer img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; border: 1px solid var(--rule); cursor: zoom-in; }
@@ -75,11 +76,11 @@
 <body>
 <nav class="side">
 <p>project 4a</p>
-<a href="#a1"><span>A.1</span>Shooting the pictures</a>
-<a href="#a2"><span>A.2</span>Recovering homographies</a>
-<a href="#a3"><span>A.3</span>Warping the images</a>
-<a href="#a4"><span>A.4</span>Blending into a mosaic</a>
-<a href="#a5"><span>B&amp;W</span>Bells &amp; whistles: cylindrical mapping (CS280A)</a>
+<a href="#a1"><span>A.1</span>Shooting the Pictures</a>
+<a href="#a2"><span>A.2</span>Recovering Homographies</a>
+<a href="#a3"><span>A.3</span>Warping the Images</a>
+<a href="#a4"><span>A.4</span>Blending into a Mosaic</a>
+<a href="#a5"><span>B&amp;W</span>Bells &amp; Whistles: Cylindrical Mapping (CS280A)</a>
 </nav>
 <header class="site">
   <p class="kicker">CS280A · Project 4A · Fall 2026</p>
@@ -94,7 +95,7 @@
 tabbed image viewers, the drag-to-compare blending slider and the folded code blocks. In this PDF every tab of every
 viewer is printed out one after another, and the slider is shown as its three versions side by side.</div>
 <section id="a1">
-  <h2><span class="num">A.1</span>Shooting the pictures</h2>
+  <h2><span class="num">A.1</span>Shooting the Pictures</h2>
 <div class="writeup">
   <p>All of these were shot on an iPhone 17. For each mosaic, I tried to stand in one spot and only rotate the phone, so the center of projection stays put. The first set is the outside of the Gateway building from the lawn out front. The second set is Weill Hall from across the roundabout. And the third is from inside Gateway, looking down over the railing.</p>
 </div>
@@ -118,14 +119,14 @@ viewer is printed out one after another, and the slider is shown as its three ve
 </section>
 
 <section id="a2">
-  <h2><span class="num">A.2</span>Recovering homographies</h2>
+  <h2><span class="num">A.2</span>Recovering Homographies</h2>
 <div class="writeup">
   <p>Each point pair gives you two equations, one for x′ and one for y′, after you multiply out the bottom row of H. For these images, I clicked 5 points by hand using the correspondence tool made by a past student, on recognizable spots in both images. Since this is an overdetermined system (10 equations for 8 unknowns), I solve it with least squares and put the 1 back in as the bottom right entry of H.</p>
 </div>
 <div class="eq">p&prime; = H p, &nbsp; H = [ a b c ; d e f ; g h 1 ]</div>
 <div class="eq">x&prime; = (a x + b y + c) / (g x + h y + 1), &nbsp; y&prime; = (d x + e y + f) / (g x + h y + 1)</div>
 <div class="eq">[ x y 1 0 0 0 &minus;x x&prime; &minus;y x&prime; ] h = x&prime;<br>[ 0 0 0 x y 1 &minus;x y&prime; &minus;y y&prime; ] h = y&prime;<span class="note">two rows per point; 5 points gives 10 equations for 8 unknowns, solved with least squares</span></div>
-<h3>correspondences</h3>
+<h3>Correspondences</h3>
 <figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic1_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, 5 points&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic2_points.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, 5 points&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 2 and 3, 5 points&quot;}]}, {&quot;tab&quot;: &quot;atrium photos 1-2&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_12_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 1 and 2, for the 4-photo panorama&quot;}]}, {&quot;tab&quot;: &quot;atrium photos 3-4&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_34_points.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, photos 3 and 4, for the 4-photo panorama&quot;}]}]">
   <div class="viewer-buttons tabs"></div>
   <div class="viewer-buttons modes"></div>
@@ -139,7 +140,7 @@ viewer is printed out one after another, and the slider is shown as its three ve
     <figure><img src="images/mosaic3_34_points.jpg" alt="Gateway atrium, photos 3 and 4, for the 4-photo panorama"><figcaption>Gateway atrium, photos 3 and 4, for the 4-photo panorama</figcaption></figure>
   </div>
 </figure>
-<h3>system of equations (Gateway, outside)</h3>
+<h3>System of Equations (Gateway, Outside)</h3>
 <div class="matrices"><div><p>A</p>
 <div class="matrix">[       571        370          1          0          0          0     -29121     -18870 ]
 [         0          0          0        571        370          1    -173584    -112480 ]
@@ -170,7 +171,7 @@ viewer is printed out one after another, and the slider is shown as its three ve
 </section>
 
 <section id="a3">
-  <h2><span class="num">A.3</span>Warping the images</h2>
+  <h2><span class="num">A.3</span>Warping the Images</h2>
 <div class="writeup">
   <p>We're using inverse warping for this assignment. So first, we apply our homography to the four corners of the image to figure out the size of the output. Then for every output pixel, you use the inverse of your homography to figure out where it came from in the original, which lets you avoid holes in your output image. For nearest neighbor interpolation, we just take the closest pixel, and bilinear takes the weighted average of the four closest pixels, which leads to a pretty sizable difference in images between the two.</p>
   <p>For rectification, all I did was click the four corners of the bulletin board and MLK sign, then map them to a rectangle. It's fairly straightforward, and our warping made it look like you're standing right in front of them pretty well. The interpolation still mattered for readability, though.</p>
@@ -178,35 +179,35 @@ viewer is printed out one after another, and the slider is shown as its three ve
 </div>
 <div class="eq">for every output pixel p&prime;: &nbsp; p = H<sup>&minus;1</sup> p&prime;, &nbsp; then sample the image at p<span class="note">bounding box from the four corners pushed through H; pixels that land outside the image stay empty (mask)</span></div>
 <div class="eq">I(x, y) = (1&minus;dx)(1&minus;dy) I<sub>00</sub> + dx(1&minus;dy) I<sub>10</sub> + (1&minus;dx) dy I<sub>01</sub> + dx dy I<sub>11</sub><span class="note">bilinear; nearest neighbor just rounds x and y</span></div>
-<h3>rect1</h3>
+<h3>Rectification 1: Bulletin Board</h3>
 <div class="gallery three">
 <figure><img src="images/rect1_corners.jpg" alt="og, clicked corners"><figcaption>og, clicked corners</figcaption></figure>
 <figure><img src="images/rect1_nn.jpg" alt="nearest neighbor"><figcaption>nearest neighbor</figcaption></figure>
 <figure><img src="images/rect1_bil.jpg" alt="bilinear"><figcaption>bilinear</figcaption></figure>
 </div>
-<h3>rect2</h3>
+<h3>Rectification 2: MLK Sign</h3>
 <div class="gallery three">
 <figure><img src="images/rect2_corners.jpg" alt="og, clicked corners"><figcaption>og, clicked corners</figcaption></figure>
 <figure><img src="images/rect2_nn.jpg" alt="nearest neighbor"><figcaption>nearest neighbor</figcaption></figure>
 <figure><img src="images/rect2_bil.jpg" alt="bilinear"><figcaption>bilinear</figcaption></figure>
 </div>
-<h3>zoomed in</h3>
+<h3>Zoomed In</h3>
 <div class="gallery two">
 <figure><img src="images/rect2_zoom_nn.jpg" alt="nearest neighbor, 4x"><figcaption>nearest neighbor, 4x</figcaption></figure>
 <figure><img src="images/rect2_zoom_bil.jpg" alt="bilinear, 4x"><figcaption>bilinear, 4x</figcaption></figure>
 </div>
-<h3>speed</h3>
+<h3>Speed</h3>
 <table class="offsets narrow"><thead><tr><th>image</th><th>output (px)</th><th>megapixels</th><th>nearest (s)</th><th>bilinear (s)</th><th>bilinear / nearest</th></tr></thead><tbody><tr><td>rect1</td><td>1410 &times; 2080</td><td>2.9</td><td>6.6</td><td>13.4</td><td>2.0&times;</td></tr><tr><td>rect2</td><td>1897 &times; 2651</td><td>5.0</td><td>10.9</td><td>22.6</td><td>2.1&times;</td></tr></tbody></table>
 </section>
 
 <section id="a4">
-  <h2><span class="num">A.4</span>Blending into a mosaic</h2>
+  <h2><span class="num">A.4</span>Blending into a Mosaic</h2>
 <div class="writeup">
   <p>Here we apply our inverse warp to create mosaics. Given two images, we keep one static and warp the other one into its frame, using bilinear interpolation. Then we can blend the images together, where each image gets a weight at every pixel equal to the distance to the nearest edge of that image. So a pixel in the middle of an image is highly valued, and a pixel at the edge is barely valued at all. The mosaic is then the weighted average of the two, which avoids any hard seams.</p>
   <p>I mostly chose buildings for my mosaics, and used two-photo mosaics for the outside of Gateway and Weill Hall. I also took a four-photo mosaic of the inside of Gateway. The first two came out pretty clean, it's hard to see much ghosting. But the inside of Gateway has quite a few high frequency features, like the bars on the walls and the railing right in front of me, and I had some small movements of my phone between rotations that caused some parallax.</p>
 </div>
 <div class="eq">mosaic = (w<sub>1</sub> I<sub>1</sub> + w<sub>2</sub> I<sub>2</sub>) / (w<sub>1</sub> + w<sub>2</sub>)<span class="note">w = distance to the nearest edge of that image (0 outside it)</span></div>
-<h3>mosaics</h3>
+<h3>Mosaics</h3>
 <figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic1.jpg&quot;, &quot;caption&quot;: &quot;Gateway building, outside&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic1_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway building, outside, source photos&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic2.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic2_sources.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall source photos&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/mosaic3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/mosaic3_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium source photos&quot;}]}, {&quot;tab&quot;: &quot;atrium, 4 photos&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;mosaic&quot;, &quot;src&quot;: &quot;images/atrium_panorama.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, all 4 photos&quot;}, {&quot;mode&quot;: &quot;source photos&quot;, &quot;src&quot;: &quot;images/atrium_sources.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium source photos&quot;}]}]">
   <div class="viewer-buttons tabs"></div>
   <div class="viewer-buttons modes"></div>
@@ -223,13 +224,13 @@ viewer is printed out one after another, and the slider is shown as its three ve
     <figure><img src="images/atrium_sources.jpg" alt="Gateway atrium source photos"><figcaption>Gateway atrium source photos</figcaption></figure>
   </div>
 </figure>
-<h3 id="a4-panorama">4-photo panorama</h3>
+<h3 id="a4-panorama">4-Photo Panorama</h3>
 <div class="writeup">
   <p>For the interior of Gateway, I also took 4 photos, to show that we can stitch together more than 2. I took points between each pair of neighbors and left photo 3 as the reference, and then we can chain together homographies to get everything into its frame. Photo 2 uses the homography from 2 to 3. Photo 1 uses the homography from 1 to 2 and then 2 to 3, so H 2→3 times H 1→2. And photo 4 uses the inverse of the homography from 3 to 4. Then we just warp them all, put them on one canvas, and feather them using the same technique as before.</p>
   <p>Picking points between these was honestly quite difficult. It's hard to keep track of the features you're choosing across multiple images, and you try to only have overlap between one image and its neighbors, but sometimes that's hard. I tried to mostly pick points that were far away in the scene to get more stable alignments, because the parallax from my slight motions made near objects shift more. There definitely is still some ghosting and doubled objects near me, but the farther out objects are still pretty good.</p>
 </div>
 <div class="eq">H<sub>1&rarr;3</sub> = H<sub>2&rarr;3</sub> H<sub>1&rarr;2</sub>, &nbsp; H<sub>4&rarr;3</sub> = H<sub>3&rarr;4</sub><sup>&minus;1</sup><span class="note">photo 3 is the reference; photo 2 uses H<sub>2&rarr;3</sub> and photo 3 uses the identity</span></div>
-<h3 id="a4-blending">why feathering</h3>
+<h3 id="a4-blending">Why Feathering</h3>
 <div class="writeup">
   <p>These images look quite bad without feathering. In the Weill Hall example, the sun made the two images expose differently, so with no blending or even a plain average, you just get a hard seam, while feathering smooths it into one gradient.</p>
 </div>
@@ -252,7 +253,7 @@ viewer is printed out one after another, and the slider is shown as its three ve
 </section>
 
 <section id="a5">
-  <h2><span class="num">B&amp;W</span>Bells &amp; whistles: cylindrical mapping (CS280A)</h2>
+  <h2><span class="num">B&amp;W</span>Bells &amp; Whistles: Cylindrical Mapping (CS280A)</h2>
 <div class="writeup">
   <p>For the cylindrical version I put each photo on a cylinder with radius f before stitching. It's inverse sampling again, for every pixel in the final mosaic I work out its angle on the cylinder, θ = (x − cx) / f, and look up where that lands in the original flat photo. So every pixel gets sampled once, straight from the original, and I never warp something that's already been warped. I move the clicked points onto the cylinder too, and then line the two photos up with a small rotation plus a shift, and blend with the same distance weights as before.</p>
   <p>For f I used 1110, which is the real focal length of the phone. I shot everything on an iPhone 17 Pro Max at 1x, which is a 24 mm equivalent lens, and at 1200 x 1600 that works out to about 24 / 43.3 x 2000 ≈ 1110 px. Compared to the planar mosaics, I think the cylindrical ones look a lot more natural, the warped side doesn't get stretched out. The tradeoff is straight lines like the roofline come out curved.</p>
@@ -324,7 +325,7 @@ viewer is printed out one after another, and the slider is shown as its three ve
 
     return mosaic.astype(np.uint8)</code></pre>
 </details>
-<h3>planar vs cylinder</h3>
+<h3>Planar vs. Cylinder</h3>
 <figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic1_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic1.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic1_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic2_cyl.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic2.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic2_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/mosaic3_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, cylinder, rotation + shift, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/mosaic3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, planar&quot;}, {&quot;mode&quot;: &quot;first try: shift only&quot;, &quot;src&quot;: &quot;images/mosaic3_cyl_shift.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, first try, shift only, f=1200&quot;}]}, {&quot;tab&quot;: &quot;atrium, 4 photos&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;cylinder&quot;, &quot;src&quot;: &quot;images/atrium_panorama_cyl.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 4 photos, cylinder, f=1110&quot;}, {&quot;mode&quot;: &quot;planar&quot;, &quot;src&quot;: &quot;images/atrium_panorama.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 4 photos, planar&quot;}]}]">
   <div class="viewer-buttons tabs"></div>
   <div class="viewer-buttons modes"></div>
@@ -344,11 +345,11 @@ viewer is printed out one after another, and the slider is shown as its three ve
     <figure><img src="images/atrium_panorama.jpg" alt="Gateway atrium, 4 photos, planar"><figcaption>Gateway atrium, 4 photos, planar</figcaption></figure>
   </div>
 </figure>
-<h3 id="a5-panorama">4-photo atrium panorama on a cylinder</h3>
+<h3 id="a5-panorama">4-Photo Atrium Panorama on a Cylinder</h3>
 <div class="writeup">
   <p>This is where the cylinder actually pays off. The planar Gateway atrium panorama has that bow tie shape, because on a plane the outer photos get stretched more the farther they are from the reference. On the cylinder, position is just angle, so every photo stays about the same size. I chained the rotation + shift fits the same way as the homographies, photo 1 goes through photo 2 to get to photo 3, and photo 4 uses the inverse, and then every pixel in the panorama gets sampled once straight from the original photos. It came out a lot more compact, 2191 x 1677 instead of 3146 x 2792, and I think it looks a lot more like what you actually see standing there.</p>
 </div>
-<h3 id="a5-roll">first try: shift only</h3>
+<h3 id="a5-roll">First Try: Shift Only</h3>
 <div class="writeup">
   <p>My first version actually looked worse than the planar mosaics, there was a lot more ghosting. The idea was that if you only rotate the camera, on the cylinder the two photos just differ by a shift, so I took the median shift of the points and that was it. The problem is that assumes a perfect level pan, and I'm a human holding a phone. Between shots the phone also rolled a little, 1.4 to 2.5 degrees, and a shift can't undo a rotation. So things lined up in the middle of the overlap and drifted apart toward the top and bottom. The homography in the planar version has 8 numbers, so it just absorbed the roll, which is why the planar ones looked better.</p>
   <p>The fix was to fit a rotation plus a shift from the same points, which is a small least squares problem, and I also switched f from 1200 to the real 1110. The table has the average error at the clicked points both ways. You can flip between them with the first try button in the viewer above. You can see it best on Weill Hall, the first version has a ghost copy of the roofline floating above the building, and in the Gateway atrium the center column is doubled. With the rotation they're both gone. There are still a few faint doubled bars on the close railing in the atrium, but that's parallax, not roll.</p>
