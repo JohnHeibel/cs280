@@ -50,6 +50,10 @@
     .viewer-print figure { margin: 0; break-inside: avoid; }
     .viewer-print img { width: 100%; height: auto; max-height: 4.2in; object-fit: contain; border: 1px solid #ccc; }
     .viewer-print figcaption { font-family: var(--mono); font-size: 0.65rem; color: #555; margin-top: 3px; text-align: center; }
+    .gallery.four { grid-template-columns: repeat(4, 1fr) !important; max-width: 100% !important; }
+    .gallery.three { grid-template-columns: repeat(3, 1fr) !important; }
+    .gallery.two { grid-template-columns: repeat(2, 1fr) !important; max-width: 100% !important; }
+    .gallery img { max-height: 3.6in; object-fit: contain; }
     .gallery figure, table, .eq, .matrices { break-inside: avoid; }
     h2, h3 { break-after: avoid; }
     section { break-before: page; }
