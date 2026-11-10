@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Image Warping and Mosaicing — CS280A Project 4A</title>
+<title>Image Warping and Mosaicing — CS280A Project 4</title>
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +40,27 @@
   .code-details { margin: 10px 0 18px; }
   .code-details summary { cursor: pointer; font-family: var(--mono); font-size: 0.85rem; color: var(--ox); }
   .cmp { margin: 18px 0 28px; }
+  .note { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-2); margin: 4px 0 8px; }
+  .stepper { margin: 14px 0 26px; }
+  .stepper img.viewer-main { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; border: 1px solid var(--rule); cursor: zoom-in; }
+  .stepper > figcaption { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-2); margin-top: 6px; text-align: center; min-height: 2.6em; }
+  .stepper-controls { display: flex; align-items: center; gap: 10px; max-width: 640px; margin: 10px auto 0; }
+  .stepper-controls input[type=range] { flex: 1; accent-color: var(--ox); cursor: pointer; }
+  .stepper-controls button { padding: 3px 12px; font: inherit; font-size: 0.8rem; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: 999px; cursor: pointer; }
+  .stepper-label { font-family: var(--mono); font-size: 0.8rem; min-width: 6.5em; text-align: right; }
+  .stepper-table { margin: 10px auto 0 !important; }
+  .stepper-table tbody tr { cursor: pointer; }
+  .stepper-table tr.on td { background: var(--paper-2) !important; font-weight: 600; }
+  .part-title { font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox); border-top: 2px solid var(--ox); padding-top: 10px; margin: 48px 0 0; }
+  .part-title:first-of-type { margin-top: 0; }
+  section > figure { margin: 14px 0 26px; text-align: center; }
+  section > figure img { display: block; max-width: 100%; height: auto; margin: 0 auto; border: 1px solid var(--rule); }
+  section > figure figcaption { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-2); margin-top: 6px; }
+  @media print {
+    .part-title { break-before: page; break-after: avoid; }
+    .part-title:first-of-type { break-before: auto; }
+    .part-title + section { break-before: auto !important; }
+  }
   .viewer-print { display: none; }
   @media print {
     :root { --paper: #ffffff; --paper-2: #f2f2f2; --ink: #111111; --ink-2: #555555; --rule: #cccccc; --ox: #9a5b12; --teal: #2f6b55; }
@@ -47,7 +68,8 @@
     body::before, body::after, header.site { background: none !important; background-image: none !important; }
     body::before, body::after { display: none !important; }
     .side, nav.toc, .lightbox, .viewer-buttons, .viewer-main, .viewer > figcaption,
-    .cmp-box, .cmp-buttons, .cmp-tabs, .cmp > figcaption, .code-details, #status { display: none !important; }
+    .cmp-box, .cmp-buttons, .cmp-tabs, .cmp > figcaption, .code-details, #status,
+    .stepper-controls, .stepper > figcaption, .note { display: none !important; }
     .viewer-print { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .viewer-print figure { margin: 0; break-inside: avoid; }
     .viewer-print img { width: 100%; height: auto; max-height: 4.2in; object-fit: contain; border: 1px solid #ccc; }
@@ -82,16 +104,23 @@
 <a href="#a3"><span>A.3</span>Warping the Images</a>
 <a href="#a4"><span>A.4</span>Blending into a Mosaic</a>
 <a href="#a5"><span>B&amp;W</span>Bells &amp; Whistles: Cylindrical Mapping (CS280A)</a>
+<p>project 4b</p>
+<a href="#b1"><span>B.1</span>Harris Corners and ANMS</a>
+<a href="#b2"><span>B.2</span>Feature Descriptors</a>
+<a href="#b3"><span>B.3</span>Feature Matching</a>
+<a href="#b4"><span>B.4</span>RANSAC and Automatic Mosaics</a>
+<a href="#b5"><span>B.5</span>Bells &amp; Whistles: Panorama Recognition and Rotation Invariance (CS280A)</a>
 </nav>
 <header class="site">
-  <p class="kicker">CS280A · Project 4A · Fall 2026</p>
-  <h1>Project 4A: Image Warping and Mosaicing</h1>
+  <p class="kicker">CS280A · Project 4 · Fall 2026</p>
+  <h1>Project 4: Image Warping and Mosaicing</h1>
   <p class="sub">John Heibel</p>
 </header>
 <nav class="toc">
-  <a href="#a1">A.1</a><a href="#a2">A.2</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#a5">B&amp;W</a>
+  <a href="#a1">A.1</a><a href="#a2">A.2</a><a href="#a3">A.3</a><a href="#a4">A.4</a><a href="#a5">B&amp;W</a><a href="#b1">B.1</a><a href="#b2">B.2</a><a href="#b3">B.3</a><a href="#b4">B.4</a><a href="#b5">B.5</a>
 </nav>
 <main>
+<p class="part-title" id="part-a">Part A: Image Warping and Mosaicing</p>
 <section id="a1">
   <h2><span class="num">A.1</span>Shooting the Pictures</h2>
 <div class="writeup">
@@ -355,6 +384,330 @@
 <table class="offsets narrow"><thead><tr><th>mosaic</th><th>roll between shots</th><th>shift only, f=1200 (px)</th><th>rotation + shift, f=1110 (px)</th></tr></thead><tbody><tr><td>Gateway, outside</td><td>1.4&deg;</td><td>13.1</td><td>1.7</td></tr><tr><td>Weill Hall</td><td>2.5&deg;</td><td>14.0</td><td>6.0</td></tr><tr><td>Gateway atrium</td><td>-1.8&deg;</td><td>14.6</td><td>1.5</td></tr></tbody></table>
 </section>
 
+<p class="part-title" id="part-b">Part B: Feature Matching for Autostitching</p>
+<section id="b1">
+  <h2><span class="num">B.1</span>Harris Corners and ANMS</h2>
+<div class="writeup">
+  <p>For corners we use the harris.py starter code. We score every pixel with our corner score, h = det(M) / trace(M), which only fires when the brightness changes in both directions, and keeps the pixels that beat their neighbors.</p>
+  <p>On my photos that gave around 49,000 corners, I sorted them by score and kept the top 3000. The problem is that the strongest corners all pile up on the trees, since leaves have edges going in every direction. ANMS fixes that. For every corner, we find the distance to the closest corner that's clearly stronger than it. Then we keep the 500 with the biggest radius. A corner just has to be the strongest thing in its neighborhood, not in the whole image, and the points end up spread out over the whole building instead of in a blob on the trees.</p>
+</div>
+<div class="eq">h = det(M) / trace(M)<span class="note">harris.py: corner_harris with method='eps', sigma=1; local peaks only, 20 px border dropped</span></div>
+<div class="eq">r<sub>i</sub> = min<sub>j</sub> | x<sub>i</sub> &minus; x<sub>j</sub> | &nbsp; over every j with &nbsp; h(x<sub>i</sub>) &lt; 0.9 h(x<sub>j</sub>)<span class="note">ANMS keeps the 500 corners with the biggest r</span></div>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;harris, top 3000&quot;, &quot;src&quot;: &quot;images/mosaic1_harris.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, harris, strongest 3000&quot;}, {&quot;mode&quot;: &quot;after ANMS, 500&quot;, &quot;src&quot;: &quot;images/mosaic1_anms.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, after ANMS, 500&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;harris, top 3000&quot;, &quot;src&quot;: &quot;images/mosaic2_harris.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, harris, strongest 3000&quot;}, {&quot;mode&quot;: &quot;after ANMS, 500&quot;, &quot;src&quot;: &quot;images/mosaic2_anms.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, after ANMS, 500&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;harris, top 3000&quot;, &quot;src&quot;: &quot;images/mosaic3_harris.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, harris, strongest 3000&quot;}, {&quot;mode&quot;: &quot;after ANMS, 500&quot;, &quot;src&quot;: &quot;images/mosaic3_anms.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, after ANMS, 500&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/mosaic1_harris.jpg" alt="Gateway, outside, harris, strongest 3000">
+  <figcaption>Gateway, outside, harris, strongest 3000</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1_harris.jpg" alt="Gateway, outside, harris, strongest 3000"><figcaption>Gateway, outside, harris, strongest 3000</figcaption></figure>
+    <figure><img src="images/mosaic1_anms.jpg" alt="Gateway, outside, after ANMS, 500"><figcaption>Gateway, outside, after ANMS, 500</figcaption></figure>
+    <figure><img src="images/mosaic2_harris.jpg" alt="Weill Hall, harris, strongest 3000"><figcaption>Weill Hall, harris, strongest 3000</figcaption></figure>
+    <figure><img src="images/mosaic2_anms.jpg" alt="Weill Hall, after ANMS, 500"><figcaption>Weill Hall, after ANMS, 500</figcaption></figure>
+    <figure><img src="images/mosaic3_harris.jpg" alt="Gateway atrium, harris, strongest 3000"><figcaption>Gateway atrium, harris, strongest 3000</figcaption></figure>
+    <figure><img src="images/mosaic3_anms.jpg" alt="Gateway atrium, after ANMS, 500"><figcaption>Gateway atrium, after ANMS, 500</figcaption></figure>
+  </div>
+</figure>
+</section>
+
+<section id="b2">
+  <h2><span class="num">B.2</span>Feature Descriptors</h2>
+<div class="writeup">
+  <p>We want a way to compare corners between photos. For each of the 500 corners, I take the 40x40 window around it and shrink it down to 8x8 by averaging each 5x5 block. The averaging also blurs it, since a blurry patch still matches when the corner is off by a pixel or two. Then we subtract the mean and divide by the standard deviation, so the same spot still matches if one photo came out brighter or with more contrast. That gives every corner 64 values to compare. These patches are aligned and only one scale, but that's fine here since I only rotated the phone between shots.</p>
+</div>
+<div class="eq">d = (p &minus; &mu;) / &sigma;, &nbsp; p = 8&times;8 block means of the 40&times;40 window<span class="note">flattened to 64 numbers; axis aligned, one scale</span></div>
+<figure><img src="images/mosaic1_patches.jpg" alt="top: 40x40 window, bottom: 8x8 descriptor" style="max-width: 820px; width: 100%"><figcaption>top: 40x40 window, bottom: 8x8 descriptor</figcaption></figure>
+<figure><img src="images/mosaic1_patch_spots.jpg" alt="where the 6 come from" style="max-width: 300px"><figcaption>where the 6 come from</figcaption></figure>
+</section>
+
+<section id="b3">
+  <h2><span class="num">B.3</span>Feature Matching</h2>
+<div class="writeup">
+  <p>When matching, we compute the distance from every descriptor in photo 1 to every descriptor in photo 2, and look at the closest and second closest. If the best one is way better than the second best, it's probably a real match. If they're close, it's ambiguous, so we throw it out.</p>
+  <p>I kept a match when the ratio was under 0.7, and you can try the other values with the slider below. Under 0.6 you throw away a lot of good matches, and past 0.7 the inlier count stops going up, so you're mostly just adding bad matches for RANSAC to throw out. My distances are squared, so 0.7 here is larger on plain distances. You can still see quite a few wrong matches in the atrium, and its inlier count jumps around with the ratio, since the railing bars all look the same.</p>
+</div>
+<div class="eq">match if &nbsp; e<sub>1-NN</sub> / e<sub>2-NN</sub> &lt; 0.7<span class="note">e = squared distance between the 64 number descriptors (dist2 from harris.py)</span></div>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic1_matches.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, 137 matches&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic2_matches.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, 200 matches&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_matches.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 154 matches&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/mosaic1_matches.jpg" alt="Gateway, outside, 137 matches">
+  <figcaption>Gateway, outside, 137 matches</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1_matches.jpg" alt="Gateway, outside, 137 matches"><figcaption>Gateway, outside, 137 matches</figcaption></figure>
+    <figure><img src="images/mosaic2_matches.jpg" alt="Weill Hall, 200 matches"><figcaption>Weill Hall, 200 matches</figcaption></figure>
+    <figure><img src="images/mosaic3_matches.jpg" alt="Gateway atrium, 154 matches"><figcaption>Gateway atrium, 154 matches</figcaption></figure>
+  </div>
+</figure>
+<h3>Try the Ratio</h3>
+<p class="note">drag the slider to change the ratio threshold; red are all the matches that pass it, green are the ones RANSAC keeps</p>
+<figure class="stepper" data-steps="{&quot;modes&quot;: [&quot;Gateway, outside&quot;, &quot;Weill Hall&quot;, &quot;Gateway atrium&quot;], &quot;steps&quot;: [{&quot;label&quot;: &quot;ratio 0.3&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_3.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.3: 26 matches, 22 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_3.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.3: 81 matches, 56 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_3.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.3: 23 matches, 13 RANSAC inliers (green)&quot;}]}, {&quot;label&quot;: &quot;ratio 0.4&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_4.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.4: 48 matches, 32 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_4.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.4: 111 matches, 73 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_4.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.4: 35 matches, 16 RANSAC inliers (green)&quot;}]}, {&quot;label&quot;: &quot;ratio 0.5&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_5.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.5: 67 matches, 40 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_5.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.5: 150 matches, 95 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_5.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.5: 64 matches, 16 RANSAC inliers (green)&quot;}]}, {&quot;label&quot;: &quot;ratio 0.6&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_6.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.6: 96 matches, 51 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_6.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.6: 181 matches, 112 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_6.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.6: 107 matches, 35 RANSAC inliers (green)&quot;}]}, {&quot;label&quot;: &quot;ratio 0.7&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_7.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.7: 137 matches, 62 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_7.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.7: 200 matches, 112 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_7.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.7: 154 matches, 24 RANSAC inliers (green)&quot;}]}, {&quot;label&quot;: &quot;ratio 0.8&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_8.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.8: 171 matches, 63 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_8.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.8: 238 matches, 107 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_8.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.8: 225 matches, 28 RANSAC inliers (green)&quot;}]}, {&quot;label&quot;: &quot;ratio 0.9&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/mosaic1_ratio_9.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, ratio 0.9: 242 matches, 61 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic2_ratio_9.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, ratio 0.9: 304 matches, 106 RANSAC inliers (green)&quot;}, {&quot;src&quot;: &quot;images/mosaic3_ratio_9.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, ratio 0.9: 342 matches, 35 RANSAC inliers (green)&quot;}]}]}" data-start="4">
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/mosaic1_ratio_7.jpg" alt="Gateway, outside, ratio 0.7: 137 matches, 62 RANSAC inliers (green)">
+  <div class="stepper-controls"><button type="button" class="back" aria-label="back">&#9664;</button><input type="range" min="0" max="6" value="4" aria-label="step"><button type="button" class="next" aria-label="next">&#9654;</button><span class="stepper-label"></span></div>
+  <figcaption>Gateway, outside, ratio 0.7: 137 matches, 62 RANSAC inliers (green)</figcaption>
+<table class="offsets narrow stepper-table"><thead><tr><th>ratio</th><th>Gateway, outside<br>matches / inliers</th><th>Weill Hall<br>matches / inliers</th><th>Gateway atrium<br>matches / inliers</th></tr></thead><tbody><tr data-step="0"><td>0.3</td><td>26 / 22</td><td>81 / 56</td><td>23 / 13</td></tr><tr data-step="1"><td>0.4</td><td>48 / 32</td><td>111 / 73</td><td>35 / 16</td></tr><tr data-step="2"><td>0.5</td><td>67 / 40</td><td>150 / 95</td><td>64 / 16</td></tr><tr data-step="3"><td>0.6</td><td>96 / 51</td><td>181 / 112</td><td>107 / 35</td></tr><tr data-step="4"><td>0.7</td><td>137 / 62</td><td>200 / 112</td><td>154 / 24</td></tr><tr data-step="5"><td>0.8</td><td>171 / 63</td><td>238 / 107</td><td>225 / 28</td></tr><tr data-step="6"><td>0.9</td><td>242 / 61</td><td>304 / 106</td><td>342 / 35</td></tr></tbody></table>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1_ratio_5.jpg" alt="Gateway, outside, ratio 0.5: 67 matches, 40 RANSAC inliers (green)"><figcaption>Gateway, outside, ratio 0.5: 67 matches, 40 RANSAC inliers (green)</figcaption></figure>
+    <figure><img src="images/mosaic1_ratio_7.jpg" alt="Gateway, outside, ratio 0.7: 137 matches, 62 RANSAC inliers (green)"><figcaption>Gateway, outside, ratio 0.7: 137 matches, 62 RANSAC inliers (green)</figcaption></figure>
+    <figure><img src="images/mosaic1_ratio_9.jpg" alt="Gateway, outside, ratio 0.9: 242 matches, 61 RANSAC inliers (green)"><figcaption>Gateway, outside, ratio 0.9: 242 matches, 61 RANSAC inliers (green)</figcaption></figure>
+  </div>
+</figure>
+</section>
+
+<section id="b4">
+  <h2><span class="num">B.4</span>RANSAC and Automatic Mosaics</h2>
+<div class="writeup">
+  <p>Even after the ratio test there are still a lot of bad matches, so we use RANSAC to pick out the good ones. Each round, I pick 4 random matches, fit an exact homography with computeH, push every photo 1 point through it, and count how many land within 3 px of their match. After 500 rounds I keep the biggest set of inliers and run computeH on all of them, which is the same least squares as Part A, just with way more points. Then the mosaic is just Part A's blend_image with that H.</p>
+  <p>Weill Hall had the most inliers, 112 out of 200, and the atrium had the fewest, 24 out of 154, because of all the repeated railing bars. In the side by side, the automatic mosaics for the outside of Gateway and Weill Hall look about the same as my manual ones, it's hard to see any difference. My clicked points land about 5 to 6 px off under the automatic H.</p>
+</div>
+<div class="eq">inlier if &nbsp; | H p &minus; p&prime; | &lt; 3 px<span class="note">500 rounds of 4 random matches; computeH again on the biggest inlier set</span></div>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Gateway, outside&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic1_ransac.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, 62 inliers (green) out of 137 matches&quot;}]}, {&quot;tab&quot;: &quot;Weill Hall&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic2_ransac.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, 112 inliers (green) out of 200 matches&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/mosaic3_ransac.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, 24 inliers (green) out of 154 matches&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/mosaic1_ransac.jpg" alt="Gateway, outside, 62 inliers (green) out of 137 matches">
+  <figcaption>Gateway, outside, 62 inliers (green) out of 137 matches</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/mosaic1_ransac.jpg" alt="Gateway, outside, 62 inliers (green) out of 137 matches"><figcaption>Gateway, outside, 62 inliers (green) out of 137 matches</figcaption></figure>
+    <figure><img src="images/mosaic2_ransac.jpg" alt="Weill Hall, 112 inliers (green) out of 200 matches"><figcaption>Weill Hall, 112 inliers (green) out of 200 matches</figcaption></figure>
+    <figure><img src="images/mosaic3_ransac.jpg" alt="Gateway atrium, 24 inliers (green) out of 154 matches"><figcaption>Gateway atrium, 24 inliers (green) out of 154 matches</figcaption></figure>
+  </div>
+</figure>
+<table class="offsets narrow"><thead><tr><th>mosaic</th><th>harris corners (photo 1)</th><th>kept, ANMS</th><th>matches</th><th>RANSAC inliers</th><th>clicked points under auto H (px)</th></tr></thead><tbody><tr><td>Gateway, outside</td><td>49,104</td><td>3000 &rarr; 500</td><td>137</td><td>62</td><td>5.3</td></tr><tr><td>Weill Hall</td><td>48,529</td><td>3000 &rarr; 500</td><td>200</td><td>112</td><td>6.3</td></tr><tr><td>Gateway atrium</td><td>48,948</td><td>3000 &rarr; 500</td><td>154</td><td>24</td><td>10.4</td></tr></tbody></table>
+<h3>RANSAC Step by Step</h3>
+<p class="note">Gateway, outside. Each round picks 4 random matches (blue), fits H to them and counts which matches land within 3 px (green). These are the first 5 rounds, every round that beat the best so far, and the final refit.</p>
+<figure class="stepper" data-steps="{&quot;modes&quot;: [&quot;round&quot;], &quot;steps&quot;: [{&quot;label&quot;: &quot;round 1&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_1.jpg&quot;, &quot;caption&quot;: &quot;round 1: 4 random matches (blue) give 5 inliers (green). new best!&quot;}]}, {&quot;label&quot;: &quot;round 2&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_2.jpg&quot;, &quot;caption&quot;: &quot;round 2: 4 random matches (blue) give 51 inliers (green). new best!&quot;}]}, {&quot;label&quot;: &quot;round 3&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_3.jpg&quot;, &quot;caption&quot;: &quot;round 3: 4 random matches (blue) give 7 inliers (green). best so far: 51, from round 2&quot;}]}, {&quot;label&quot;: &quot;round 4&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_4.jpg&quot;, &quot;caption&quot;: &quot;round 4: 4 random matches (blue) give 4 inliers (green). best so far: 51, from round 2&quot;}]}, {&quot;label&quot;: &quot;round 5&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_5.jpg&quot;, &quot;caption&quot;: &quot;round 5: 4 random matches (blue) give 4 inliers (green). best so far: 51, from round 2&quot;}]}, {&quot;label&quot;: &quot;round 137&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_137.jpg&quot;, &quot;caption&quot;: &quot;round 137: 4 random matches (blue) give 62 inliers (green). new best!&quot;}]}, {&quot;label&quot;: &quot;final&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/ransac_round_final.jpg&quot;, &quot;caption&quot;: &quot;after 500 rounds: computeH on all 62 inliers from round 137 (green), out of 137 matches&quot;}]}]}" data-start="0">
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/ransac_round_1.jpg" alt="round 1: 4 random matches (blue) give 5 inliers (green). new best!">
+  <div class="stepper-controls"><button type="button" class="back" aria-label="back">&#9664;</button><input type="range" min="0" max="6" value="0" aria-label="step"><button type="button" class="next" aria-label="next">&#9654;</button><span class="stepper-label"></span></div>
+  <figcaption>round 1: 4 random matches (blue) give 5 inliers (green). new best!</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/ransac_round_1.jpg" alt="round 1: 4 random matches (blue) give 5 inliers (green). new best!"><figcaption>round 1: 4 random matches (blue) give 5 inliers (green). new best!</figcaption></figure>
+    <figure><img src="images/ransac_round_4.jpg" alt="round 4: 4 random matches (blue) give 4 inliers (green). best so far: 51, from round 2"><figcaption>round 4: 4 random matches (blue) give 4 inliers (green). best so far: 51, from round 2</figcaption></figure>
+    <figure><img src="images/ransac_round_final.jpg" alt="after 500 rounds: computeH on all 62 inliers from round 137 (green), out of 137 matches"><figcaption>after 500 rounds: computeH on all 62 inliers from round 137 (green), out of 137 matches</figcaption></figure>
+  </div>
+</figure>
+<h3>Manual vs. Automatic</h3>
+<p class="row-title">Gateway, outside</p>
+<div class="gallery two">
+<figure><img src="images/mosaic1.jpg" alt="manual, 5 clicked points"><figcaption>manual, 5 clicked points</figcaption></figure>
+<figure><img src="images/mosaic1_auto.jpg" alt="automatic"><figcaption>automatic</figcaption></figure>
+</div>
+<p class="row-title">Weill Hall</p>
+<div class="gallery two">
+<figure><img src="images/mosaic2.jpg" alt="manual, 5 clicked points"><figcaption>manual, 5 clicked points</figcaption></figure>
+<figure><img src="images/mosaic2_auto.jpg" alt="automatic"><figcaption>automatic</figcaption></figure>
+</div>
+<p class="row-title">Gateway atrium</p>
+<div class="gallery two">
+<figure><img src="images/mosaic3.jpg" alt="manual, 5 clicked points"><figcaption>manual, 5 clicked points</figcaption></figure>
+<figure><img src="images/mosaic3_auto.jpg" alt="automatic"><figcaption>automatic</figcaption></figure>
+</div>
+<h3 id="b4-zoom">Zoomed In: Atrium Railing</h3>
+<div class="writeup">
+  <p>The atrium is where the automatic one is worse. Almost all of its 24 inliers are on the top floor, so the homography only really gets focused up there and drifts toward the bottom. You can see it on the lower floor, where the white columns and the wood wall are doubled in the automatic version but clean in the manual one, since my 5 clicked points went from the top floor all the way down. That drift is also why my clicked points are about 10 px off under its H. The railing bars actually look sharper in the automatic one, but that's mostly luck, since the bars repeat, so a shifted copy lands right on the next bar.</p>
+</div>
+<div class="gallery two">
+<figure><img src="images/mosaic3_zoom_manual.jpg" alt="manual"><figcaption>manual</figcaption></figure>
+<figure><img src="images/mosaic3_zoom_auto.jpg" alt="automatic"><figcaption>automatic</figcaption></figure>
+</div>
+</section>
+
+<section id="b5">
+  <h2><span class="num">B.5</span>Bells &amp; Whistles: Panorama Recognition and Rotation Invariance (CS280A)</h2>
+<div class="writeup">
+  <p>For bells and whistles I did panorama recognition. I took all 10 of my photos, including the bulletin board and MLK sign from the rectification part as decoys, and shuffled them, so the code doesn't know which ones go together. Then we run the whole pipeline on every pair, 45 of them, and keep a pair if it has at least 20 inliers and the homography looks like a real one, more on that below. Accepted pairs get linked, and linked photos go in the same group, so atrium 1 and atrium 4 end up together even though they barely overlap, since they connect through 2 and 3. For each group I pick the photo with the most links as the reference, chain the homographies out from it like in A.4, and stitch with multiMosaic.</p>
+  <p>It found exactly the 3 panoramas, and the bulletin board and MLK sign stayed on their own. So the 4 photo atrium panorama here is fully automatic, no clicked points at all, which is honestly pretty nice after how hard it was to pick those points by hand.</p>
+</div>
+<figure><img src="images/pano_input.jpg" alt="the 10 photos, shuffled: Weill 1, MLK sign, atrium 3, atrium 1, Gateway out 1, Weill 2, Gateway out 2, atrium 4, bulletin board, atrium 2"><figcaption>the 10 photos, shuffled: Weill 1, MLK sign, atrium 3, atrium 1, Gateway out 1, Weill 2, Gateway out 2, atrium 4, bulletin board, atrium 2</figcaption></figure>
+<div class="eq">same panorama if &nbsp; inliers &ge; 20 &nbsp; and &nbsp; 0.25 &lt; det(H<sub>2&times;2</sub>) &lt; 4<span class="note">det of the top left 2&times;2 of H is about how much it scales area: real neighbors were about 0.3 to 3, fake matches about 0</span></div>
+<figure><img src="images/pano_links.jpg" alt="RANSAC inliers for every pair, red boxes are the accepted ones" style="max-width: 640px"><figcaption>RANSAC inliers for every pair, red boxes are the accepted ones</figcaption></figure>
+<h3>Groups Found</h3>
+<p class="row-title">group 1: Weill 1, Weill 2</p>
+<figure><img src="images/group_mosaic2_1.jpg" alt="Weill 1, Weill 2" style="max-height: 170px; width: auto"><figcaption>Weill 1, Weill 2</figcaption></figure>
+<p class="row-title">group 2: MLK sign</p>
+<figure><img src="images/group_rect2.jpg" alt="MLK sign" style="max-height: 170px; width: auto"><figcaption>MLK sign</figcaption></figure>
+<p class="row-title">group 3: atrium 1, atrium 2, atrium 3, atrium 4</p>
+<figure><img src="images/group_mosaic3_1.jpg" alt="atrium 1, atrium 2, atrium 3, atrium 4" style="max-height: 170px; width: auto"><figcaption>atrium 1, atrium 2, atrium 3, atrium 4</figcaption></figure>
+<p class="row-title">group 4: Gateway out 1, Gateway out 2</p>
+<figure><img src="images/group_mosaic1_1.jpg" alt="Gateway out 1, Gateway out 2" style="max-height: 170px; width: auto"><figcaption>Gateway out 1, Gateway out 2</figcaption></figure>
+<p class="row-title">group 5: bulletin board</p>
+<figure><img src="images/group_rect1.jpg" alt="bulletin board" style="max-height: 170px; width: auto"><figcaption>bulletin board</figcaption></figure>
+<h3>Found Panoramas</h3>
+<figure class="viewer" data-tabs="[{&quot;tab&quot;: &quot;Weill Hall (2 photos)&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/found_mosaic2_1.jpg&quot;, &quot;caption&quot;: &quot;Weill Hall, found and stitched automatically, 2 photos&quot;}]}, {&quot;tab&quot;: &quot;Gateway atrium (4 photos)&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/found_mosaic3_1.jpg&quot;, &quot;caption&quot;: &quot;Gateway atrium, found and stitched automatically, 4 photos&quot;}]}, {&quot;tab&quot;: &quot;Gateway, outside (2 photos)&quot;, &quot;modes&quot;: [{&quot;mode&quot;: &quot;&quot;, &quot;src&quot;: &quot;images/found_mosaic1_1.jpg&quot;, &quot;caption&quot;: &quot;Gateway, outside, found and stitched automatically, 2 photos&quot;}]}]">
+  <div class="viewer-buttons tabs"></div>
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/found_mosaic2_1.jpg" alt="Weill Hall, found and stitched automatically, 2 photos">
+  <figcaption>Weill Hall, found and stitched automatically, 2 photos</figcaption>
+  <div class="viewer-print">
+    <figure><img src="images/found_mosaic2_1.jpg" alt="Weill Hall, found and stitched automatically, 2 photos"><figcaption>Weill Hall, found and stitched automatically, 2 photos</figcaption></figure>
+    <figure><img src="images/found_mosaic3_1.jpg" alt="Gateway atrium, found and stitched automatically, 4 photos"><figcaption>Gateway atrium, found and stitched automatically, 4 photos</figcaption></figure>
+    <figure><img src="images/found_mosaic1_1.jpg" alt="Gateway, outside, found and stitched automatically, 2 photos"><figcaption>Gateway, outside, found and stitched automatically, 2 photos</figcaption></figure>
+  </div>
+</figure>
+<h3 id="b5-fake">The Fake Match</h3>
+<div class="writeup">
+  <p>Just counting inliers wasn't enough. Gateway outside 1 and atrium 1 got 20 inliers, which is almost as many as the real atrium neighbors, which had 26 and 27. But the homography for this fake match squashes the whole atrium photo down to almost a single line on Gateway, and a bunch of matches happen to sit along that line, mostly on repeating edges like railing bars and door frames. You can see it here, most of the atrium points land on the same spot on Gateway.</p>
+  <p>To catch this, I also check the determinant of the top left 2x2 of H, which is roughly how much it scales area. Real neighbors were between 0.3 and 3, and the fakes were basically 0. So a pair only counts if it has at least 20 inliers and the determinant is between 0.25 and 4.</p>
+</div>
+<figure><img src="images/pano_fake.jpg" alt="atrium 1 vs Gateway out 1: 20 inliers out of 41 matches, det = 0.000, rejected"><figcaption>atrium 1 vs Gateway out 1: 20 inliers out of 41 matches, det = 0.000, rejected</figcaption></figure>
+<details class="code-details"><summary>show the code</summary>
+<pre class="code"><code class="language-python">def samePanorama(H, inliers):
+    det = np.linalg.det(H[:2, :2])
+    if len(inliers) &lt; 20:
+        return False
+    if det &lt; 0.25 or det &gt; 4:
+        return False
+    return True</code></pre>
+<pre class="code"><code class="language-python">def loadAllPhotos(folder):
+    names = []
+    for file in sorted(os.listdir(folder)):
+        if file.endswith(&quot;.jpg&quot;):
+            names.append(file[:-4])
+    np.random.shuffle(names)
+
+    images = []
+    points = []
+    descriptors = []
+    for name in names:
+        image = plt.imread(f&quot;{folder}/{name}.jpg&quot;)
+        image_points, image_descriptors = getFeatures(image)
+        images.append(image)
+        points.append(image_points)
+        descriptors.append(image_descriptors)
+    return names, images, points, descriptors</code></pre>
+<pre class="code"><code class="language-python">def matchAllPairs(points, descriptors):
+    n = len(points)
+    links = np.zeros((n, n))
+    homographies = {}
+    for i in range(n):
+        for j in range(i + 1, n):
+            match1, match2 = matchFeatures(descriptors[i], descriptors[j], points[i], points[j], 0.7)
+            if len(match1) &lt; 4:
+                continue
+            H, inliers1, inliers2 = ransac(match1, match2, 500, 3)
+            if samePanorama(H, inliers1):
+                links[i, j] = len(inliers1)
+                links[j, i] = len(inliers1)
+                homographies[(i, j)] = H
+                homographies[(j, i)] = np.linalg.inv(H)
+    return links, homographies</code></pre>
+<pre class="code"><code class="language-python">def groupPhotos(links):
+    n = len(links)
+    labels = []
+    for i in range(n):
+        labels.append(i)
+
+    for i in range(n):
+        for j in range(n):
+            if links[i, j] &gt; 0:
+                old = labels[j]
+                new = labels[i]
+                for k in range(n):
+                    if labels[k] == old:
+                        labels[k] = new
+
+    groups = []
+    for label in range(n):
+        members = []
+        for k in range(n):
+            if labels[k] == label:
+                members.append(k)
+        if len(members) &gt; 0:
+            groups.append(members)
+    return groups</code></pre>
+<pre class="code"><code class="language-python">def stitchGroup(members, images, links, pair_homographies):
+    reference = members[0]
+    for k in members:
+        if np.sum(links[k] &gt; 0) &gt; np.sum(links[reference] &gt; 0):
+            reference = k
+
+    homographies = {reference: np.eye(3)}
+    added = True
+    while added:
+        added = False
+        for a in members:
+            for b in members:
+                if a in homographies and b not in homographies and links[a, b] &gt; 0:
+                    homographies[b] = homographies[a] @ pair_homographies[(b, a)]
+                    added = True
+                    
+
+    group_images = []
+    H_list = []
+    for k in members:
+        group_images.append(images[k])
+        H_list.append(homographies[k])
+    return multiMosaic(group_images, H_list)</code></pre>
+</details>
+<h3 id="b5-rotation">Rotation Invariance</h3>
+<div class="writeup">
+  <p>I also made the descriptors rotation invariant. My normal patches are always lined up with the image axes, so if you tilt the camera, the same corner gives a totally different patch. To fix that, for each corner I blur the image and take the gradient at the corner, which is the direction the brightness increases fastest, and rotate the 8x8 sampling grid to line up with it. The rotated points don't land on pixels anymore, so I sample with the same bilinear function from Part A. If the photo is rotated, the gradient rotates with it, so the patch comes out the same.</p>
+  <p>To test it, I rotated Weill Hall photo 2 by 30 degrees with my own warp function and tried matching it against photo 1. With the normal descriptors, only 17 matches made it through the ratio test and RANSAC found 6 inliers, so the pair gets rejected. With the rotated descriptors, there were 133 matches and 77 inliers, so it's a clean match. On the unrotated pair they do a little worse than the normal ones, 93 inliers vs 112, since the angle adds some noise, but that's still plenty.</p>
+</div>
+<div class="eq">patch angle = atan2(&part;I/&part;y, &part;I/&part;x) &nbsp; at the corner<span class="note">gradient of the image blurred with sigma 4.5; the 8x8 grid is rotated by this angle and sampled with bilinear()</span></div>
+<p class="note">drag the slider to rotate Weill Hall photo 2; the buttons switch between my normal descriptors and the rotated ones</p>
+<figure class="stepper" data-steps="{&quot;modes&quot;: [&quot;normal descriptors&quot;, &quot;rotated descriptors&quot;], &quot;steps&quot;: [{&quot;label&quot;: &quot;0\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_0_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 0\u00b0, normal descriptors: 112 inliers (green) out of 200 matches, accepted&quot;}, {&quot;src&quot;: &quot;images/rot_0_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 0\u00b0, rotated descriptors: 93 inliers (green) out of 169 matches, accepted&quot;}]}, {&quot;label&quot;: &quot;15\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_15_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 15\u00b0, normal descriptors: 15 inliers (green) out of 35 matches, rejected&quot;}, {&quot;src&quot;: &quot;images/rot_15_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 15\u00b0, rotated descriptors: 58 inliers (green) out of 99 matches, accepted&quot;}]}, {&quot;label&quot;: &quot;30\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_30_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 30\u00b0, normal descriptors: 6 inliers (green) out of 17 matches, rejected&quot;}, {&quot;src&quot;: &quot;images/rot_30_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 30\u00b0, rotated descriptors: 77 inliers (green) out of 133 matches, accepted&quot;}]}, {&quot;label&quot;: &quot;45\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_45_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 45\u00b0, normal descriptors: 7 inliers (green) out of 17 matches, rejected&quot;}, {&quot;src&quot;: &quot;images/rot_45_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 45\u00b0, rotated descriptors: 84 inliers (green) out of 142 matches, accepted&quot;}]}, {&quot;label&quot;: &quot;60\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_60_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 60\u00b0, normal descriptors: 9 inliers (green) out of 17 matches, rejected&quot;}, {&quot;src&quot;: &quot;images/rot_60_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 60\u00b0, rotated descriptors: 82 inliers (green) out of 139 matches, accepted&quot;}]}, {&quot;label&quot;: &quot;75\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_75_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 75\u00b0, normal descriptors: 6 inliers (green) out of 18 matches, rejected&quot;}, {&quot;src&quot;: &quot;images/rot_75_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 75\u00b0, rotated descriptors: 61 inliers (green) out of 105 matches, accepted&quot;}]}, {&quot;label&quot;: &quot;90\u00b0&quot;, &quot;items&quot;: [{&quot;src&quot;: &quot;images/rot_90_plain.jpg&quot;, &quot;caption&quot;: &quot;rotated 90\u00b0, normal descriptors: 7 inliers (green) out of 22 matches, rejected&quot;}, {&quot;src&quot;: &quot;images/rot_90_rotated.jpg&quot;, &quot;caption&quot;: &quot;rotated 90\u00b0, rotated descriptors: 95 inliers (green) out of 169 matches, accepted&quot;}]}]}" data-start="2">
+  <div class="viewer-buttons modes"></div>
+  <img class="viewer-main" src="images/rot_30_plain.jpg" alt="rotated 30°, normal descriptors: 6 inliers (green) out of 17 matches, rejected">
+  <div class="stepper-controls"><button type="button" class="back" aria-label="back">&#9664;</button><input type="range" min="0" max="6" value="2" aria-label="step"><button type="button" class="next" aria-label="next">&#9654;</button><span class="stepper-label"></span></div>
+  <figcaption>rotated 30°, normal descriptors: 6 inliers (green) out of 17 matches, rejected</figcaption>
+<table class="offsets narrow stepper-table"><thead><tr><th>rotation</th><th>normal<br>matches / inliers</th><th>rotated<br>matches / inliers</th></tr></thead><tbody><tr data-step="0"><td>0&deg;</td><td>200 / 112 &#10003;</td><td>169 / 93 &#10003;</td></tr><tr data-step="1"><td>15&deg;</td><td class="bad">35 / 15 &#10007;</td><td>99 / 58 &#10003;</td></tr><tr data-step="2"><td>30&deg;</td><td class="bad">17 / 6 &#10007;</td><td>133 / 77 &#10003;</td></tr><tr data-step="3"><td>45&deg;</td><td class="bad">17 / 7 &#10007;</td><td>142 / 84 &#10003;</td></tr><tr data-step="4"><td>60&deg;</td><td class="bad">17 / 9 &#10007;</td><td>139 / 82 &#10003;</td></tr><tr data-step="5"><td>75&deg;</td><td class="bad">18 / 6 &#10007;</td><td>105 / 61 &#10003;</td></tr><tr data-step="6"><td>90&deg;</td><td class="bad">22 / 7 &#10007;</td><td>169 / 95 &#10003;</td></tr></tbody></table>
+  <div class="viewer-print">
+    <figure><img src="images/rot_30_plain.jpg" alt="rotated 30°, normal descriptors: 6 inliers (green) out of 17 matches, rejected"><figcaption>rotated 30°, normal descriptors: 6 inliers (green) out of 17 matches, rejected</figcaption></figure>
+    <figure><img src="images/rot_30_rotated.jpg" alt="rotated 30°, rotated descriptors: 77 inliers (green) out of 133 matches, accepted"><figcaption>rotated 30°, rotated descriptors: 77 inliers (green) out of 133 matches, accepted</figcaption></figure>
+  </div>
+</figure>
+<details class="code-details"><summary>show the code</summary>
+<pre class="code"><code class="language-python">def rotateImage(image, degrees):
+    angle = np.radians(degrees)
+    R = np.array([[np.cos(angle), -np.sin(angle), 0],
+                  [np.sin(angle), np.cos(angle), 0],
+                  [0, 0, 1]])
+    rotated, offset, mask = warpImageBilinear(image, R)
+    return rotated.astype(np.uint8)</code></pre>
+<pre class="code"><code class="language-python">def getRotatedDescriptors(gray, points):
+    patch_blur = 2
+    gradient_blur = 4.5
+    window_half = 20
+    spacing = 5
+    first_offset = -window_half + spacing / 2
+    border = 30
+
+    smooth = gaussian_filter(gray, patch_blur)
+    gradient_y, gradient_x = np.gradient(gaussian_filter(gray, gradient_blur))
+    height, width = gray.shape
+
+    kept = []
+    descriptors = []
+    for i in range(len(points)):
+        x = points[i, 0]
+        y = points[i, 1]
+        if x &lt; border or y &lt; border or x &gt;= width - border or y &gt;= height - border:
+            continue
+
+        angle = np.arctan2(gradient_y[y, x], gradient_x[y, x])
+        cos_angle = np.cos(angle)
+        sin_angle = np.sin(angle)
+
+        patch = np.zeros((8, 8))
+        for row in range(8):
+            for col in range(8):
+                offset_x = first_offset + col * spacing
+                offset_y = first_offset + row * spacing
+                sample_x = x + cos_angle * offset_x - sin_angle * offset_y
+                sample_y = y + sin_angle * offset_x + cos_angle * offset_y
+                patch[row, col] = bilinear(smooth, sample_x, sample_y)
+
+        patch = (patch - patch.mean()) / patch.std()
+        kept.append(points[i])
+        descriptors.append(patch.flatten())
+    return np.array(kept), np.array(descriptors)</code></pre>
+<pre class="code"><code class="language-python">def getRotatedFeatures(image):
+    gray, corners, strengths = getCorners(image, 3000)
+    points = anms(corners, strengths, 500)
+    return getRotatedDescriptors(gray, points)</code></pre>
+</details>
+</section>
+
 
 </main>
 <div class="lightbox" id="lightbox"><img alt=""></div>
@@ -431,6 +784,58 @@
         tabRow.appendChild(b);
       });
     }
+    picture.addEventListener("click", function () {
+      box.querySelector("img").src = picture.src;
+      box.classList.add("on");
+    });
+    show();
+  });
+
+  // steppers: the slider picks the step, the buttons pick the mode, table rows are clickable too
+  document.querySelectorAll(".stepper").forEach(function (figure) {
+    var data = JSON.parse(figure.dataset.steps);
+    var slider = figure.querySelector("input");
+    var picture = figure.querySelector(".viewer-main");
+    var caption = figure.querySelector(":scope > figcaption");
+    var label = figure.querySelector(".stepper-label");
+    var modeRow = figure.querySelector(".modes");
+    var rows = figure.querySelectorAll("tr[data-step]");
+    var current = { step: Number(figure.dataset.start), mode: 0 };
+    var loaded = false;
+    function show() {
+      var item = data.steps[current.step].items[current.mode];
+      picture.src = item.src;
+      picture.alt = item.caption;
+      caption.textContent = item.caption;
+      label.textContent = data.steps[current.step].label;
+      slider.value = current.step;
+      rows.forEach(function (row) { row.classList.toggle("on", Number(row.dataset.step) === current.step); });
+      modeRow.querySelectorAll("button").forEach(function (b, i) { b.classList.toggle("on", i === current.mode); });
+    }
+    if (data.modes.length > 1) {
+      data.modes.forEach(function (m, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = m;
+        b.addEventListener("click", function () { current.mode = i; show(); });
+        modeRow.appendChild(b);
+      });
+    }
+    slider.addEventListener("input", function () { current.step = Number(slider.value); show(); });
+    figure.querySelector(".back").addEventListener("click", function () {
+      if (current.step > 0) { current.step -= 1; show(); }
+    });
+    figure.querySelector(".next").addEventListener("click", function () {
+      if (current.step < data.steps.length - 1) { current.step += 1; show(); }
+    });
+    rows.forEach(function (row) {
+      row.addEventListener("click", function () { current.step = Number(row.dataset.step); show(); });
+    });
+    figure.addEventListener("pointerenter", function () {
+      if (loaded) { return; }
+      loaded = true;
+      data.steps.forEach(function (s) { s.items.forEach(function (it) { var im = new Image(); im.src = it.src; }); });
+    });
     picture.addEventListener("click", function () {
       box.querySelector("img").src = picture.src;
       box.classList.add("on");

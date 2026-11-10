@@ -1,0 +1,110 @@
+{
+ "places": {
+  "mosaic1": {
+   "label": "Gateway, outside",
+   "corners": 49104,
+   "matches": 137,
+   "inliers": 62,
+   "error": 5.337200615767919
+  },
+  "mosaic2": {
+   "label": "Weill Hall",
+   "corners": 48529,
+   "matches": 200,
+   "inliers": 112,
+   "error": 6.323141547750405
+  },
+  "mosaic3": {
+   "label": "Gateway atrium",
+   "corners": 48948,
+   "matches": 154,
+   "inliers": 24,
+   "error": 10.408859342699543
+  }
+ },
+ "pano": {
+  "order": [
+   "mosaic2_1",
+   "rect2",
+   "mosaic3_3",
+   "mosaic3_1",
+   "mosaic1_1",
+   "mosaic2_2",
+   "mosaic1_2",
+   "mosaic3_4",
+   "rect1",
+   "mosaic3_2"
+  ],
+  "groups": [
+   {
+    "key": "mosaic2_1",
+    "names": [
+     "mosaic2_1",
+     "mosaic2_2"
+    ]
+   },
+   {
+    "key": "rect2",
+    "names": [
+     "rect2"
+    ]
+   },
+   {
+    "key": "mosaic3_1",
+    "names": [
+     "mosaic3_1",
+     "mosaic3_2",
+     "mosaic3_3",
+     "mosaic3_4"
+    ]
+   },
+   {
+    "key": "mosaic1_1",
+    "names": [
+     "mosaic1_1",
+     "mosaic1_2"
+    ]
+   },
+   {
+    "key": "rect1",
+    "names": [
+     "rect1"
+    ]
+   }
+  ],
+  "fake": {
+   "a": "mosaic3_1",
+   "b": "mosaic1_1",
+   "inliers": 20,
+   "matches": 41,
+   "det": 2.1804010156723235e-11
+  },
+  "accepted": [
+   [
+    "mosaic2_1",
+    "mosaic2_2",
+    112
+   ],
+   [
+    "mosaic3_3",
+    "mosaic3_4",
+    69
+   ],
+   [
+    "mosaic3_3",
+    "mosaic3_2",
+    27
+   ],
+   [
+    "mosaic3_1",
+    "mosaic3_2",
+    26
+   ],
+   [
+    "mosaic1_1",
+    "mosaic1_2",
+    62
+   ]
+  ]
+ }
+}
